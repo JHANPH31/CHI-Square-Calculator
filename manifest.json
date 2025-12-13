@@ -16,39 +16,22 @@
   
   "icons": [
     {
-      "src": "CHllogo.png",
+      "src": "CHilogo.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
-      "src": "icon-192.png",
+      "src": "chiPHONEE.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "chiLAPPYY.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    }
-  ],
-  
-  "screenshots": [
-    {
-      "src": "chiPHONEE.png",
-      "sizes": "1170x2532",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Mobile Chi-Square Calculator"
-    },
-    {
-      "src": "chiLAPPYY.png",
-      "sizes": "1920x1080",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Desktop Chi-Square Calculator"
     }
   ],
   
