@@ -1,12 +1,12 @@
 {
   "name": "Chi-Square Test Calculator",
-  "short_name": "ChiSquare App",
+  "short_name": "ChiSquare",
   "description": "Statistical analysis tool for chi-square test of independence",
   "start_url": "/CHI-Square-Calculator/",
   "display": "standalone",
-  "background_color": "#457740",
-  "theme_color": "#624700",
-  "orientation": "portrait",
+  "background_color": "#f5f7fa",
+  "theme_color": "#6a2fb2",
+  "orientation": "any",
   "icons": [
     {
       "src": "icon-192.png",
@@ -22,5 +22,10 @@
     }
   ],
   "categories": ["education", "productivity", "utilities"],
-  "scope": "/CHI-Square-Calculator/"
+  "scope": "/CHI-Square-Calculator/",
+  "id": "/CHI-Square-Calculator/",
+  "dir": "ltr",
+  "lang": "en-US",
+  "display_override": ["standalone", "minimal-ui"],
+  "prefer_related_applications": false
 }
