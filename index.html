@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
-    <title>Chi-Square Test Calculator with Critical Values</title>
+    <title>Chi-Square Test Calculator</title>
     
     <!-- PWA Configuration -->
     <link rel="manifest" href="manifest.json">
@@ -33,10 +33,100 @@
             -webkit-tap-highlight-color: transparent;
         }
         
+        :root {
+            --primary-1: #6a2fb2;
+            --primary-2: #8b3fb6;
+            --accent: #ffc107;
+            --accent-light: #ffe082;
+        }
+        
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+        
         body {
             background-color: #f5f7fa;
             color: #333;
             line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* START SCREEN - Fullscreen image background */
+        .start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('chiLAPPYY.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            overflow: hidden;
+        }
+        
+        .start-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        .start-button {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent);
+            color: var(--primary-1);
+            border: none;
+            padding: 20px 60px;
+            font-size: 2rem;
+            font-weight: 800;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            z-index: 100;
+            min-height: 70px;
+        }
+        
+        .start-button:hover {
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            background-color: #ffd54f;
+        }
+        
+        .start-button:active {
+            transform: translateX(-50%) scale(0.98);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* App content should be hidden initially */
+        .app-content {
+            display: none;
+            width: 100vw;
+            min-height: 100vh;
+            overflow-y: auto;
             padding: 20px;
             max-width: 1400px;
             margin: 0 auto;
@@ -46,48 +136,102 @@
             padding-right: max(20px, env(safe-area-inset-right));
         }
         
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            margin-top: 20px;
-            align-items: flex-start;
+        .app-content.visible {
+            display: block;
+            animation: fadeIn 0.5s ease;
         }
         
-        :root{
-            --primary-1: #6a2fb2; /* deep purple */
-            --primary-2: #8b3fb6; /* medium purple */
-            --accent: #ffc107; /* golden yellow */
-            --accent-light: #ffe082; /* light yellow */
-            --muted: #f5f3fb;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
-
+        
+        /* Header */
         header {
             background: linear-gradient(135deg, var(--primary-2) 0%, var(--primary-1) 100%);
             color: white;
-            padding: 30px 25px;
+            padding: 25px;
             border-radius: 10px;
             box-shadow: 0 5px 20px rgba(106,47,178,0.15);
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             text-align: center;
         }
         
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+        .header-content {
             display: flex;
             align-items: center;
-            gap: 15px;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
         }
         
-        h1 i {
+        .logo-container {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-2), var(--primary-1));
+            box-shadow: 0 6px 14px rgba(106,47,178,0.12);
+        }
+        
+        .logo-text {
+            color: white;
+            font-weight: 800;
+            font-size: 1.8rem;
+        }
+        
+        .logo-text sup {
+            font-size: 0.9rem;
+            vertical-align: super;
+        }
+        
+        .app-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .main-title {
             font-size: 2.2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0;
+        }
+        
+        .title-accent {
+            background: var(--accent);
+            color: var(--primary-1);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 800;
         }
         
         .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            max-width: 800px;
+            font-size: 0.95rem;
+            opacity: 0.95;
+            color: rgba(255,255,255,0.9);
+            margin: 6px 0 0;
+        }
+        
+        .version {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.8);
+            font-style: italic;
+            margin: 2px 0 0;
+        }
+        
+        /* Container */
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin-top: 20px;
+            align-items: flex-start;
         }
         
         .main-content {
@@ -96,25 +240,25 @@
         }
         
         .sidebar {
-            flex: 0 0 360px;
-            background-color: rgb(145, 21, 199);
+            flex: 0 0 350px;
+            background-color: white;
             border-radius: 10px;
-            padding: 25px;
+            padding: 20px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
         
         .card {
-            background-color: rgb(255, 255, 255);
+            background-color: white;
             border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 25px;
+            padding: 20px;
+            margin-bottom: 20px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
         
         h2 {
             color: var(--primary-1);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
             border-bottom: 2px solid var(--accent-light);
             display: flex;
             align-items: center;
@@ -126,9 +270,10 @@
             margin: 15px 0 10px;
         }
         
+        /* Step Indicator */
         .step-indicator {
             display: flex;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             background-color: #f8f9fa;
             border-radius: 10px;
             padding: 5px;
@@ -137,7 +282,7 @@
         .step {
             flex: 1;
             text-align: center;
-            padding: 15px 10px;
+            padding: 14px 10px;
             font-weight: 600;
             border-radius: 8px;
             transition: all 0.3s;
@@ -155,6 +300,7 @@
             color: var(--primary-1);
         }
         
+        /* Input Sections */
         .input-section {
             display: none;
         }
@@ -164,19 +310,19 @@
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 600;
             color: #182848;
         }
         
         input, select {
             width: 100%;
-            padding: 16px 15px;
+            padding: 14px 12px;
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 1rem;
@@ -195,13 +341,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             flex-wrap: wrap;
             gap: 10px;
         }
         
         .btn {
-            padding: 14px 24px;
+            padding: 12px 20px;
             border: none;
             border-radius: 6px;
             font-weight: 600;
@@ -212,7 +358,7 @@
             gap: 8px;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            min-height: 50px;
+            min-height: 44px;
             min-width: 44px;
         }
         
@@ -257,19 +403,20 @@
         .btn-group {
             display: flex;
             gap: 10px;
-            margin-top: 20px;
+            margin-top: 15px;
             flex-wrap: wrap;
         }
         
+        /* Tables */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin: 15px 0;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
         }
         
         th, td {
-            padding: 12px 15px;
+            padding: 10px 12px;
             text-align: center;
             border: 1px solid #ddd;
         }
@@ -282,24 +429,25 @@
         
         td input {
             width: 100%;
-            padding: 12px 10px;
+            padding: 10px 8px;
             text-align: center;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 1rem;
         }
         
+        /* Results */
         .results {
             background-color: #f8f9fa;
-            padding: 20px;
+            padding: 18px;
             border-radius: 8px;
-            margin-top: 20px;
+            margin-top: 15px;
         }
         
         .result-item {
             display: flex;
             justify-content: space-between;
-            padding: 12px 0;
+            padding: 10px 0;
             border-bottom: 1px solid #e9ecef;
             align-items: center;
         }
@@ -315,10 +463,10 @@
         
         .significance {
             display: inline-block;
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 4px;
             font-weight: 600;
-            margin-left: 10px;
+            margin-left: 8px;
         }
         
         .significant {
@@ -331,92 +479,29 @@
             color: #6c6c6c;
         }
         
+        .comparison {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid #ffc107;
+        }
+        
         .interpretation {
-            margin-top: 20px;
+            margin-top: 15px;
             padding: 15px;
             background-color: #e8f0fe;
             border-left: 4px solid #4b6cb7;
             border-radius: 4px;
         }
         
-        .chart-container {
-            height: 300px;
-            margin-top: 20px;
-        }
-        
-        .example {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            border-left: 4px solid #4b6cb7;
-        }
-        
         .instructions {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #6c757d;
             margin-top: 5px;
         }
         
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .critical-value-table-container {
-            overflow-x: auto;
-            margin-top: 10px;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .critical-value-table {
-            font-size: 0.85rem;
-        }
-        
-        .critical-value-table th {
-            background-color: #e9ecef;
-            position: sticky;
-            top: 0;
-        }
-        
-        .critical-value-table td.highlight {
-            background-color: #fff3cd;
-            font-weight: bold;
-        }
-        
-        .comparison {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-            border-left: 4px solid #ffc107;
-        }
-        
-        #install-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #6a2fb2 0%, #8b3fb6 100%);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-weight: bold;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(106,47,178,0.3);
-            cursor: pointer;
-            display: none;
-        }
-        
-        /* FIXED: Group and Category Name Inputs */
+        /* Input Containers */
         .input-container {
             background: #f8f9fa;
             border-radius: 8px;
@@ -426,17 +511,15 @@
         }
         
         .input-hint {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #6c757d;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             font-style: italic;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
             border-bottom: 1px dashed #dee2e6;
         }
         
         #group-names-container, #category-names-container {
-            max-height: 400px;
-            overflow-y: auto;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             padding: 15px;
@@ -454,28 +537,93 @@
             display: flex;
             align-items: center;
             padding: 8px 0;
+            gap: 12px;
         }
         
-        .input-group-wrapper label {
-            min-width: 100px;
+        .input-group-wrapper > div > div:first-child {
+            min-width: 80px;
             font-weight: 600;
             color: #333;
-            margin-bottom: 0;
+            text-align: left;
         }
         
         .input-group-wrapper input {
             flex: 1;
-            padding: 12px 15px;
+            padding: 10px 12px;
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 1rem;
         }
         
-        /* Mobile Optimizations */
+        /* Critical Value Table */
+        .critical-value-table-container {
+            overflow-x: auto;
+            margin-top: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .critical-value-table {
+            font-size: 0.85rem;
+        }
+        
+        .critical-value-table th {
+            background-color: #e9ecef;
+            position: sticky;
+            left: 0;
+        }
+        
+        .critical-value-table td.highlight {
+            background-color: #fff3cd;
+            font-weight: bold;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        /* Install Button */
+        #install-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #6a2fb2 0%, #8b3fb6 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(106,47,178,0.3);
+            cursor: pointer;
+            display: none;
+        }
+        
+        /* Mobile Styles */
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
-                font-size: 16px;
+            .start-button {
+                bottom: 40px;
+                padding: 18px 40px;
+                font-size: 1.8rem;
+                min-height: 65px;
+            }
+            
+            .header-content {
+                gap: 15px;
+            }
+            
+            .logo-container {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .main-title {
+                font-size: 1.8rem;
             }
             
             .container {
@@ -488,14 +636,6 @@
                 padding: 15px;
             }
             
-            .card {
-                padding: 15px;
-            }
-            
-            h1 {
-                font-size: 1.8rem;
-            }
-            
             .step-indicator {
                 flex-direction: column;
             }
@@ -505,34 +645,15 @@
                 padding: 12px 8px;
             }
             
-            .table-controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .btn-group {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-                justify-content: center;
-                margin-bottom: 5px;
-            }
-            
-            table {
-                font-size: 14px;
-            }
-            
-            th, td {
-                padding: 8px 5px;
-                min-width: 60px;
-            }
-            
-            .result-item {
+            .input-group-wrapper > div {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 5px;
+                gap: 6px;
+            }
+            
+            .input-group-wrapper > div > div:first-child {
+                min-width: auto;
+                width: 100%;
             }
             
             #install-button {
@@ -541,22 +662,15 @@
                 padding: 10px 16px;
                 font-size: 14px;
             }
-            
-            /* Mobile fixes for input containers */
-            #group-names-container, #category-names-container {
-                max-height: 300px;
-                padding: 10px;
-            }
-            
-            .input-group-wrapper > div {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-            
-            .input-group-wrapper label {
-                min-width: auto;
-                width: 100%;
+        }
+        
+        @media (max-width: 480px) {
+            .start-button {
+                bottom: 30px;
+                padding: 16px 30px;
+                font-size: 1.6rem;
+                min-height: 60px;
+                border-radius: 12px;
             }
         }
         
@@ -564,259 +678,248 @@
             .container {
                 flex-direction: column;
             }
-            
-            .sidebar {
-                flex: 1;
-            }
-        }
-        
-        /* Standalone mode adjustments */
-        @media (display-mode: standalone) {
-            body {
-                overscroll-behavior: none;
-            }
-            
-            header {
-                padding-top: calc(30px + env(safe-area-inset-top, 20px));
-            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div style="display:flex;align-items:center;justify-content:center;gap:18px;">
-            <div style="width:84px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:linear-gradient(135deg,var(--primary-2),var(--primary-1));box-shadow:0 6px 14px rgba(106,47,178,0.12);">
-                <span style="color:white;font-weight:800;font-size:1.6rem;">X<span style="font-size:0.9rem;vertical-align:top">2</span></span>
-            </div>
-            <div>
-                <h1 style="margin:0;font-size:2rem;color:white;display:flex;align-items:center;justify-content:center;gap:12px;">
-                    <span style="font-weight:700;letter-spacing:1px;">CHI</span>
-                    <span style="background:var(--accent);color:var(--primary-1);padding:6px 12px;border-radius:6px;font-weight:800;">SQUARE</span>
-                </h1>
-                <p class="subtitle" style="margin:6px 0 0;font-size:0.95rem;opacity:0.95;color:rgba(255,255,255,0.9)">TEST OF INDEPENDENCE CALCULATOR</p>
-                <p style="margin:2px 0 0;font-size:0.85rem;color:rgba(255,255,255,0.8);font-style:italic;">Mobile App Version</p>
-            </div>
-        </div>
-    </header>
-    
-    <div class="step-indicator">
-        <div class="step active" id="step1-indicator">1. Setup Table</div>
-        <div class="step" id="step2-indicator">2. Enter Data</div>
-        <div class="step" id="step3-indicator">3. View Results</div>
+    <!-- START SCREEN with chiLAPPY.png as background -->
+    <div class="start-screen" id="startScreen">
+        <button class="start-button" id="startButton">
+            START
+        </button>
     </div>
     
-    <div class="container">
-        <div class="main-content">
-            <div class="card">
-                <div class="input-section active" id="step1">
-                    <h2><i class="fas fa-table"></i> Step 1: Define Groups and Categories</h2>
-                    <p class="instructions">Enter names for your groups (rows) and categories (columns). You can use up to 5 groups and 5 categories.<br><em>Example: Groups could be Genders like: "Male, Female, Lgbtq++". Categories could be Grades "80-85", "86-90", "91-95", "96-100".</em></p>
-                    
-                    <div class="form-group">
-                        <label for="num-groups">Number of Groups (Rows)</label>
-                        <select id="num-groups">
-                            <option value="2">2</option>
-                            <option value="3" selected>3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                        </select>
+    <!-- MAIN APP CONTENT -->
+    <div class="app-content" id="appContent">
+        <header>
+            <div class="header-content">
+                <div class="logo-container">
+                    <span class="logo-text">X<sup>2</sup></span>
+                </div>
+                <div class="app-title">
+                    <h1 class="main-title">
+                        <span>CHI</span>
+                        <span class="title-accent">SQUARE</span>
+                    </h1>
+                    <p class="subtitle">TEST OF INDEPENDENCE CALCULATOR</p>
+                    <p class="version"></p>
+                </div>
+            </div>
+        </header>
+        
+        <div class="step-indicator">
+            <div class="step active" id="step1-indicator">1. Setup Table</div>
+            <div class="step" id="step2-indicator">2. Enter Data</div>
+            <div class="step" id="step3-indicator">3. View Results</div>
+        </div>
+        
+        <div class="container">
+            <div class="main-content">
+                <div class="card">
+                    <!-- STEP 1: Setup Table -->
+                    <div class="input-section active" id="step1">
+                        <h2><i class="fas fa-table"></i> Step 1: Define Groups and Categories</h2>
+                        <p class="instructions">Enter names for your groups (rows) and categories (columns). You can use up to 5 groups and 5 categories.</p>
+                        
+                        <div class="form-group">
+                            <label for="num-groups">Number of Groups (Rows)</label>
+                            <select id="num-groups">
+                                <option value="2">2</option>
+                                <option value="3" selected>3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="num-categories">Number of Categories (Columns)</label>
+                            <select id="num-categories">
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4" selected>4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                        
+                        <h3>Group Names (Rows)</h3>
+                        <div id="group-names-container" class="input-container">
+                            <div class="input-hint">Enter names for your groups (e.g., Male, Female, LGBTQ+)</div>
+                        </div>
+                        
+                        <h3>Category Names (Columns)</h3>
+                        <div id="category-names-container" class="input-container">
+                            <div class="input-hint">Enter names for your categories (e.g., 80-85, 86-90, 91-95, 96-100)</div>
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button class="btn btn-primary" id="next-step1">
+                                Next: Enter Data <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        
+                        <h3>Critical Value Table</h3>
+                        <p class="instructions">Find the critical value for your degrees of freedom (df) and selected significance level (α).</p>
+                        
+                        <div class="critical-value-table-container">
+                            <table class="critical-value-table">
+                                <thead>
+                                    <tr>
+                                        <th>df</th>
+                                        <th>0.10</th>
+                                        <th>0.05</th>
+                                        <th>0.025</th>
+                                        <th>0.01</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="critical-value-table-body"></tbody>
+                            </table>
+                        </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="num-categories">Number of Categories (Columns)</label>
-                        <select id="num-categories">
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4" selected>4</option>
-                            <option value="5">5</option>
-                        </select>
+                    <!-- STEP 2: Enter Data -->
+                    <div class="input-section" id="step2">
+                        <h2><i class="fas fa-edit"></i> Step 2: Enter Observed Frequencies</h2>
+                        <p class="instructions">Enter the observed frequencies (counts) for each combination of group and category in the table below.</p>
+                        
+                        <div class="table-controls">
+                            <div class="btn-group">
+                                <button class="btn btn-secondary" id="clear-table-btn">
+                                    <i class="fas fa-eraser"></i> Clear Table
+                                </button>
+                                <button class="btn btn-secondary" id="auto-fill-btn">
+                                    <i class="fas fa-magic"></i> Auto-Fill
+                                </button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-secondary" id="back-step2">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                                <button class="btn btn-primary" id="next-step2">
+                                    Next: Calculate <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="data-table-container"></div>
                     </div>
                     
-                    <h3>Group Names (Rows)</h3>
-                    <div id="group-names-container" class="input-container">
-                        <div class="input-hint">Enter names for your groups (e.g., Male, Female, LGBTQ+)</div>
-                        <!-- Group names will be generated here -->
-                    </div>
-                    
-                    <h3>Category Names (Columns)</h3>
-                    <div id="category-names-container" class="input-container">
-                        <div class="input-hint">Enter names for your categories (e.g., 80-85, 86-90, 91-95, 96-100)</div>
-                        <!-- Category names will be generated here -->
-                    </div>
-                    
-                    <div class="btn-group">
-                        <button class="btn btn-primary" id="next-step1">
-                            Next: Enter Data <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                    
-                    <h3>Critical Value Table</h3>
-                    <p class="instructions">Find the critical value for your degrees of freedom (df) and selected significance level (α).</p>
-                    
-                    <div class="critical-value-table-container">
-                        <table class="critical-value-table">
-                            <thead>
-                                <tr>
-                                    <th>df</th>
-                                    <th>0.10</th>
-                                    <th>0.05</th>
-                                    <th>0.025</th>
-                                    <th>0.01</th>
-                                </tr>
-                            </thead>
-                            <tbody id="critical-value-table-body">
-                                <!-- Critical values will be inserted here -->
-                            </tbody>
-                        </table>
+                    <!-- STEP 3: Results -->
+                    <div class="input-section" id="step3">
+                        <h2><i class="fas fa-chart-bar"></i> Step 3: Chi-Square Test Results</h2>
+                        <p class="instructions">The chi-square test results are displayed below. Compare the computed chi-square statistic to the critical value to determine if there is a significant relationship between the variables.</p>
+                        
+                        <div class="results">
+                            <div class="result-item">
+                                <span>1. H₀ (ACCEPTED OR REJECTED)</span>
+                                <span class="result-value">
+                                    <span id="result-text">Not calculated yet</span>
+                                    <span class="significance hidden" id="significance-indicator"></span>
+                                </span>
+                            </div>
+                            <div class="result-item">
+                                <span>2. Degrees of Freedom (df):</span>
+                                <span class="result-value" id="degrees-of-freedom">0</span>
+                            </div>
+                            <div class="result-item">
+                                <span>3. Significance Level (α)</span>
+                                <span class="result-value">
+                                    <select id="significance-level">
+                                        <option value="0.10">0.10</option>
+                                        <option value="0.05" selected>0.05</option>
+                                        <option value="0.025">0.025</option>
+                                        <option value="0.01">0.01</option>
+                                    </select>
+                                </span>
+                            </div>
+                            <div class="result-item">
+                                <span>4. Critical Value:</span>
+                                <span class="result-value" id="critical-value">0.00</span>
+                            </div>
+                            <div class="result-item">
+                                <span>5. Computed χ² Value:</span>
+                                <span class="result-value" id="chi-square-value">0.00</span>
+                            </div>
+                            <div class="result-item">
+                                <span>6. Decision:</span>
+                                <span class="result-value">
+                                    <span id="comparison-text">Not calculated yet</span>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison">
+                            <h3><i class="fas fa-balance-scale"></i> Computed vs. Critical Value</h3>
+                            <p id="comparison-details">After you calculate the chi-square test, the comparison between computed and critical values will appear here.</p>
+                        </div>
+                        
+                        <div class="interpretation">
+                            <h3><i class="fas fa-lightbulb"></i> Interpretation</h3>
+                            <p id="interpretation-text">After you calculate the chi-square test, the interpretation will appear here. It will explain whether there's a statistically significant relationship between your groups and categories.</p>
+                        </div>
+                        
+                        <h3>Observed Frequencies</h3>
+                        <div id="observed-table-display"></div>
+                        
+                        <h3>Chi-Square Calculation Details</h3>
+                        <div id="breakdown-table-container"></div>
+                        
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" id="back-step3">
+                                <i class="fas fa-arrow-left"></i> Back to Data Entry
+                            </button>
+                            <button class="btn btn-info" id="download-results-btn">
+                                <i class="fas fa-download"></i> Download Results
+                            </button>
+                            <button class="btn btn-success" id="new-calculation-btn">
+                                <i class="fas fa-redo"></i> New Calculation
+                            </button>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="input-section" id="step2">
-                    <h2><i class="fas fa-edit"></i> Step 2: Enter Observed Frequencies</h2>
-                    <p class="instructions">Enter the observed frequencies (counts) for each combination of group and category in the table below.</p>
+            </div>
+            
+            <div class="sidebar">
+                <div class="card">
+                    <h2><i class="fas fa-info-circle"></i> About Chi-Square Test</h2>
+                    <p>The chi-square test determines if there's a significant association between two categorical variables by comparing computed χ² to critical values.</p>
                     
-                    <div class="table-controls">
-                        <div class="btn-group">
-                            <button class="btn btn-secondary" id="clear-table-btn">
-                                <i class="fas fa-eraser"></i> Clear Table
-                            </button>
-                            <button class="btn btn-secondary" id="auto-fill-btn">
-                                <i class="fas fa-magic"></i> Auto-Fill
-                            </button>
-                        </div>
-                        <div class="btn-group">
-                            <button class="btn btn-secondary" id="back-step2">
-                                <i class="fas fa-arrow-left"></i> Back
-                            </button>
-                            <button class="btn btn-primary" id="next-step2">
-                                Next: Calculate <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="data-table-container">
-                        <!-- Data table will be generated here -->
-                    </div>
+                    <h3>Decision Rule</h3>
+                    <p>Compare your computed χ² value to the critical value from the table:</p>
+                    <ul>
+                        <li>If χ² ≥ Critical Value: Reject null hypothesis (significant relationship)</li>
+                        <li>If χ² < Critical Value: Fail to reject null hypothesis (no significant relationship)</li>
+                    </ul>
                 </div>
                 
-                <div class="input-section" id="step3">
-                    <h2><i class="fas fa-chart-bar"></i> Step 3: Chi-Square Test Results</h2>
-                    <p class="instructions">The chi-square test results are displayed below. Compare the computed chi-square statistic to the critical value to determine if there is a significant relationship between the variables.</p>
-                    
-                    <div class="results">
-                        <div class="result-item">
-                            <span>1. HO (ACCEPTED OR REJECTED)</span>
-                            <span class="result-value">
-                                <span id="result-text">Not calculated yet</span>
-                                <span class="significance hidden" id="significance-indicator"></span>
-                            </span>
-                        </div>
-                        <div class="result-item">
-                            <span>2. DF:</span>
-                            <span class="result-value" id="degrees-of-freedom">0</span>
-                        </div>
-                        <div class="result-item">
-                            <span>3. SIGNIFICANCE LEVEL</span>
-                            <span class="result-value">
-                                <select id="significance-level">
-                                    <option value="0.10">0.10</option>
-                                    <option value="0.05" selected>0.05</option>
-                                    <option value="0.025">0.025</option>
-                                    <option value="0.01">0.01</option>
-                                </select>
-                            </span>
-                        </div>
-                        <div class="result-item">
-                            <span>4. CRITICAL VALUE:</span>
-                            <span class="result-value" id="critical-value">0.00</span>
-                        </div>
-                        <div class="result-item">
-                            <span>5. COMPUTED VALUE:</span>
-                            <span class="result-value" id="chi-square-value">0.00</span>
-                        </div>
-                        <div class="result-item">
-                            <span>6. DECISION:</span>
-                            <span class="result-value">
-                                <span id="comparison-text">Not calculated yet</span>
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="comparison">
-                        <h3><i class="fas fa-balance-scale"></i> Computed vs. Critical Value</h3>
-                        <p id="comparison-details">After you calculate the chi-square test, the comparison between computed and critical values will appear here.</p>
-                    </div>
-                    
-                    <div class="interpretation">
-                        <h3><i class="fas fa-lightbulb"></i> Interpretation</h3>
-                        <p id="interpretation-text">After you calculate the chi-square test, the interpretation will appear here. It will explain whether there's a statistically significant relationship between your groups and categories.</p>
-                    </div>
-                    
-                    <h3>Observed Frequencies</h3>
-                    <div id="observed-table-display"></div>
-                    
-                    <h3>Chi-Square Calculation Details</h3>
-                    <div id="breakdown-table-container"></div>
-                    
-                    <div class="btn-group">
-                        <button class="btn btn-secondary" id="back-step3">
-                            <i class="fas fa-arrow-left"></i> Back to Data Entry
-                        </button>
-                        <button class="btn btn-info" id="download-results-btn">
-                            <i class="fas fa-download"></i> Download Results
-                        </button>
-                        <button class="btn btn-success" id="new-calculation-btn">
-                            <i class="fas fa-redo"></i> New Calculation
-                        </button>
-                    </div>
+                <div class="card">
+                    <h2><i class="fas fa-calculator"></i> Expected Frequency Table</h2>
+                    <p class="instructions">Expected frequencies are calculated as (row total × column total) ÷ grand total.</p>
+                    <div id="expected-table-container" style="border: 1px solid #e9ecef; border-radius: 6px; padding: 8px;"></div>
+                </div>
+                
+                <div class="card">
+                    <h2><i class="fas fa-mobile-alt"></i> Mobile App Features</h2>
+                    <p>This app can be installed on your device:</p>
+                    <ul>
+                        <li>Works offline</li>
+                        <li>Launch from home screen</li>
+                        <li>Full screen experience</li>
+                        <li>No internet needed after install</li>
+                    </ul>
+                    <button class="btn btn-primary" id="mobile-install-btn" style="width: 100%; margin-top: 10px;">
+                        <i class="fas fa-download"></i> Install App
+                    </button>
                 </div>
             </div>
         </div>
         
-        <div class="sidebar">
-            <div class="card">
-                <h2><i class="fas fa-info-circle"></i> About Chi-Square Test</h2>
-                <p>The chi-square test determines if there's a significant association between two categorical variables by comparing computed χ² to critical values.</p>
-                
-                <h3>Decision Rule</h3>
-                <p>Compare your computed χ² value to the critical value from the table:</p>
-                <ul>
-                    <li>If χ² ≥ Critical Value: Reject null hypothesis (significant relationship)</li>
-                    <li>If χ² < Critical Value: Fail to reject null hypothesis (no significant relationship)</li>
-                </ul>
-            </div>
-            
-            <div class="card">
-                <h2><i class="fas fa-calculator"></i> EXPECTED FREQUENCY TABLE</h2>
-                <p class="instructions">Expected frequencies are calculated as (row total × column total) ÷ grand total.</p>
-                <div id="expected-table-container" style="border: 1px solid #e9ecef; border-radius: 6px; padding: 8px;">
-                    <!-- Expected frequencies table will appear here -->
-                </div>
-            </div>
-            
-            <div class="card">
-                <h2><i class="fas fa-mobile-alt"></i> Mobile App Features</h2>
-                <p>This app can be installed on your device:</p>
-                <ul>
-                    <li>Works offline</li>
-                    <li>Launch from home screen</li>
-                    <li>Full screen experience</li>
-                    <li>No internet needed after install</li>
-                </ul>
-                <button class="btn btn-primary" id="mobile-install-btn" style="width: 100%; margin-top: 10px;">
-                    <i class="fas fa-download"></i> Install App
-                </button>
-            </div>
-        </div>
+        <footer>
+            <p>Chi-Square Test Calculator Mobile App</p>
+            <p>Works offline • Installable • No app store required</p>
+        </footer>
+        
+        <button id="install-button" style="display: none;">📱 Install App</button>
     </div>
-    
-    <footer>
-        <p>Chi-Square Test Calculator Mobile App</p>
-        <p>Works offline • Installable • No app store required</p>
-    </footer>
-    
-    <!-- Install Button (floating) -->
-    <button id="install-button" style="display: none;">📱 Install App</button>
     
     <script>
         // State variables
@@ -832,9 +935,8 @@
         let grandTotal = 0;
         let deferredPrompt = null;
         
-        // Chi-Square Critical Values Table (from the image)
+        // Chi-Square Critical Values Table
         const chiSquareTable = {
-            // Format: df: {alpha: criticalValue}
             1: {0.10: 2.706, 0.05: 3.841, 0.025: 5.024, 0.01: 6.635},
             2: {0.10: 4.605, 0.05: 5.991, 0.025: 7.378, 0.01: 9.210},
             3: {0.10: 6.251, 0.05: 7.815, 0.025: 9.348, 0.01: 11.345},
@@ -875,20 +977,32 @@
         };
         
         // DOM Elements
-        const step1Section = document.getElementById('step1');
-        const step2Section = document.getElementById('step2');
-        const step3Section = document.getElementById('step3');
-        const step1Indicator = document.getElementById('step1-indicator');
-        const step2Indicator = document.getElementById('step2-indicator');
-        const step3Indicator = document.getElementById('step3-indicator');
-        const installButton = document.getElementById('install-button');
-        const mobileInstallBtn = document.getElementById('mobile-install-btn');
+        const startScreen = document.getElementById('startScreen');
+        const startButton = document.getElementById('startButton');
+        const appContent = document.getElementById('appContent');
         
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
+            // Add fallback for image loading
+            const bgImage = new Image();
+            bgImage.src = 'chiLAPPYY.png';
+            
+            bgImage.onerror = function() {
+                console.log('chiLAPPYY.png not found, trying chiLAPPY.png');
+                startScreen.style.backgroundImage = "url('chiLAPPYY.png')";
+                
+                const fallbackImage = new Image();
+                fallbackImage.src = 'chiLAPPYY.png';
+                
+                fallbackImage.onerror = function() {
+                    console.log('Images not found, showing text fallback');
+                    showImageFallback();
+                };
+            };
+            
             initializeGroupNames();
             initializeCategoryNames();
-            updateGroupAndCategoryNames(); // FIXED: Added this line
+            updateGroupAndCategoryNames();
             updateTableSizeControls();
             populateCriticalValueTable();
             setupEventListeners();
@@ -896,21 +1010,69 @@
             checkStandaloneMode();
         });
         
-        // Initialize group names inputs - FIXED VERSION
+        // Fallback if images don't load
+        function showImageFallback() {
+            startScreen.style.backgroundImage = "none";
+            startScreen.style.background = "linear-gradient(135deg, var(--primary-2) 0%, var(--primary-1) 100%)";
+            startScreen.innerHTML = `
+                <div style="
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    text-align: center;
+                    color: white;
+                    padding: 20px;
+                    box-sizing: border-box;
+                ">
+                    <div style="font-size: 6rem; font-weight: bold; margin-bottom: 30px; color: var(--accent);">
+                        X²
+                    </div>
+                    <div style="font-size: 4.5rem; font-weight: 800; letter-spacing: 4px; margin-bottom: 15px;">
+                        CHI-V
+                    </div>
+                    <div style="font-size: 4rem; font-weight: 800; color: var(--accent); margin-bottom: 30px; letter-spacing: 3px;">
+                        SQUARE
+                    </div>
+                    <div style="font-size: 3rem; font-weight: 600; margin-bottom: 50px;">
+                        CALCULATOR
+                    </div>
+                </div>
+                <button class="start-button" id="startButton">
+                    START
+                </button>
+            `;
+            
+            // Re-attach the start button event listener
+            document.getElementById('startButton').addEventListener('click', startApp);
+        }
+        
+        // Start the app
+        function startApp() {
+            // Hide start screen with animation
+            startScreen.classList.add('hidden');
+            
+            // Show app content after a short delay
+            setTimeout(() => {
+                appContent.classList.add('visible');
+                startScreen.style.display = 'none';
+                // Re-enable scrolling for the app content
+                document.body.style.overflow = 'auto';
+                document.documentElement.style.overflow = 'auto';
+            }, 500);
+        }
+        
+        // Initialize group names inputs
         function initializeGroupNames() {
             const container = document.getElementById('group-names-container');
-            // Clear only the input area, keep the hint
             const hint = container.querySelector('.input-hint');
             container.innerHTML = '';
-            if (hint) {
-                container.appendChild(hint);
-            } else {
-                // Add hint if not present
-                const newHint = document.createElement('div');
-                newHint.className = 'input-hint';
-                newHint.textContent = 'Enter names for your groups (e.g., Male, Female, LGBTQ+)';
-                container.appendChild(newHint);
-            }
+            if (hint) container.appendChild(hint);
             
             const wrapper = document.createElement('div');
             wrapper.className = 'input-group-wrapper';
@@ -919,26 +1081,22 @@
                 const div = document.createElement('div');
                 div.style.display = 'flex';
                 div.style.alignItems = 'center';
-                div.style.gap = '10px';
+                div.style.gap = '12px';
                 div.style.padding = '8px 0';
                 
-                const label = document.createElement('label');
-                label.textContent = `Group ${i+1}:`;
+                const label = document.createElement('div');
+                label.textContent = `Group ${i+1}`;
                 label.style.minWidth = '80px';
                 label.style.fontWeight = '600';
                 label.style.color = '#333';
-                label.style.marginBottom = '0';
                 
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.id = `group-${i}`;
                 input.placeholder = `Enter name for Group ${i+1}`;
-                input.value = i < groupNames.length ? groupNames[i] : `Group ${i+1}`;
+                input.value = i < groupNames.length && groupNames[i] ? groupNames[i] : '';
                 input.style.flex = '1';
-                input.style.padding = '12px 15px';
-                input.style.border = '1px solid #ddd';
-                input.style.borderRadius = '6px';
-                input.style.fontSize = '1rem';
+                input.style.padding = '10px 12px';
                 input.classList.add('group-name-input');
                 
                 div.appendChild(label);
@@ -954,21 +1112,12 @@
             container.appendChild(wrapper);
         }
         
-        // Initialize category names inputs - FIXED VERSION
+        // Initialize category names inputs
         function initializeCategoryNames() {
             const container = document.getElementById('category-names-container');
-            // Clear only the input area, keep the hint
             const hint = container.querySelector('.input-hint');
             container.innerHTML = '';
-            if (hint) {
-                container.appendChild(hint);
-            } else {
-                // Add hint if not present
-                const newHint = document.createElement('div');
-                newHint.className = 'input-hint';
-                newHint.textContent = 'Enter names for your categories (e.g., 80-85, 86-90, 91-95, 96-100)';
-                container.appendChild(newHint);
-            }
+            if (hint) container.appendChild(hint);
             
             const wrapper = document.createElement('div');
             wrapper.className = 'input-group-wrapper';
@@ -977,26 +1126,22 @@
                 const div = document.createElement('div');
                 div.style.display = 'flex';
                 div.style.alignItems = 'center';
-                div.style.gap = '10px';
+                div.style.gap = '12px';
                 div.style.padding = '8px 0';
                 
-                const label = document.createElement('label');
-                label.textContent = `Category ${i+1}:`;
+                const label = document.createElement('div');
+                label.textContent = `Category ${i+1}`;
                 label.style.minWidth = '80px';
                 label.style.fontWeight = '600';
                 label.style.color = '#333';
-                label.style.marginBottom = '0';
                 
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.id = `category-${i}`;
                 input.placeholder = `Enter name for Category ${i+1}`;
-                input.value = i < categoryNames.length ? categoryNames[i] : `Category ${i+1}`;
+                input.value = i < categoryNames.length && categoryNames[i] ? categoryNames[i] : '';
                 input.style.flex = '1';
-                input.style.padding = '12px 15px';
-                input.style.border = '1px solid #ddd';
-                input.style.borderRadius = '6px';
-                input.style.fontSize = '1rem';
+                input.style.padding = '10px 12px';
                 input.classList.add('category-name-input');
                 
                 div.appendChild(label);
@@ -1020,15 +1165,45 @@
             groups = parseInt(numGroupsSelect.value);
             categories = parseInt(numCategoriesSelect.value);
             
-            // Show/hide group name inputs
-            document.querySelectorAll('#group-names-container .input-group-wrapper > div').forEach((div, index) => {
-                div.style.display = index < groups ? 'flex' : 'none';
-            });
+            const groupWrapper = document.querySelector('#group-names-container .input-group-wrapper');
+            if (groupWrapper) {
+                const groupDivs = groupWrapper.children;
+                for (let i = 0; i < groupDivs.length; i++) {
+                    groupDivs[i].style.display = i < groups ? 'flex' : 'none';
+                }
+            }
             
-            // Show/hide category name inputs
-            document.querySelectorAll('#category-names-container .input-group-wrapper > div').forEach((div, index) => {
-                div.style.display = index < categories ? 'flex' : 'none';
-            });
+            const categoryWrapper = document.querySelector('#category-names-container .input-group-wrapper');
+            if (categoryWrapper) {
+                const categoryDivs = categoryWrapper.children;
+                for (let i = 0; i < categoryDivs.length; i++) {
+                    categoryDivs[i].style.display = i < categories ? 'flex' : 'none';
+                }
+            }
+        }
+        
+        // Update group and category names from inputs
+        function updateGroupAndCategoryNames() {
+            groupNames = [];
+            categoryNames = [];
+            
+            for (let i = 0; i < groups; i++) {
+                const input = document.getElementById(`group-${i}`);
+                if (input && input.value.trim()) {
+                    groupNames.push(input.value.trim());
+                } else {
+                    groupNames.push(`Group ${i+1}`);
+                }
+            }
+            
+            for (let j = 0; j < categories; j++) {
+                const input = document.getElementById(`category-${j}`);
+                if (input && input.value.trim()) {
+                    categoryNames.push(input.value.trim());
+                } else {
+                    categoryNames.push(`Category ${j+1}`);
+                }
+            }
         }
         
         // Populate the critical value table
@@ -1036,20 +1211,16 @@
             const tableBody = document.getElementById('critical-value-table-body');
             tableBody.innerHTML = '';
             
-            // Define the degrees of freedom to show
             const dfsToShow = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30, 40, 50];
             
-            // Create rows for each degree of freedom
             dfsToShow.forEach(df => {
                 const row = document.createElement('tr');
                 
-                // DF cell
                 const dfCell = document.createElement('td');
                 dfCell.textContent = df;
                 dfCell.style.fontWeight = 'bold';
                 row.appendChild(dfCell);
                 
-                // Critical value cells for each alpha level
                 const alphas = [0.10, 0.05, 0.025, 0.01];
                 
                 alphas.forEach(alpha => {
@@ -1071,18 +1242,15 @@
         
         // Highlight the current critical value in the table
         function highlightCriticalValue(df, alpha) {
-            // Remove previous highlights
             document.querySelectorAll('.critical-value-table td').forEach(cell => {
                 cell.classList.remove('highlight');
             });
             
-            // Find and highlight the current critical value
             const rows = document.querySelectorAll('#critical-value-table-body tr');
             
             rows.forEach(row => {
                 const dfCell = row.querySelector('td:first-child');
                 if (dfCell && parseInt(dfCell.textContent) === df) {
-                    // Determine which alpha column to highlight
                     let alphaIndex;
                     if (alpha === 0.10) alphaIndex = 1;
                     else if (alpha === 0.05) alphaIndex = 2;
@@ -1101,30 +1269,25 @@
         
         // Create the data entry table
         function createDataTable() {
-            // Get current group and category names
             updateGroupAndCategoryNames();
             
             const container = document.getElementById('data-table-container');
             container.innerHTML = '';
             
-            // Create table element
             const table = document.createElement('table');
             table.id = 'data-table';
             
-            // Create header row with category names
             let headerRow = '<thead><tr><th></th>';
             for (let j = 0; j < categories; j++) {
                 headerRow += `<th>${categoryNames[j] || `Category ${j+1}`}</th>`;
             }
             headerRow += '<th>Row Total</th></tr></thead>';
             
-            // Create table body with data inputs
             let tableBody = '<tbody>';
             for (let i = 0; i < groups; i++) {
                 tableBody += `<tr><th>${groupNames[i] || `Group ${i+1}`}</th>`;
                 
                 for (let j = 0; j < categories; j++) {
-                    // Initialize observedData if needed
                     if (!observedData[i]) observedData[i] = [];
                     if (!observedData[i][j]) observedData[i][j] = 0;
                     
@@ -1135,11 +1298,9 @@
                         inputmode="numeric"></td>`;
                 }
                 
-                // Row total cell
                 tableBody += `<td id="row-total-${i}" class="row-total">0</td></tr>`;
             }
             
-            // Create footer row for column totals
             tableBody += '<tr><th>Column Total</th>';
             for (let j = 0; j < categories; j++) {
                 tableBody += `<td id="col-total-${j}" class="col-total">0</td>`;
@@ -1150,40 +1311,20 @@
             table.innerHTML = headerRow + tableBody;
             container.appendChild(table);
             
-            // Add event listeners to data inputs
             document.querySelectorAll('.data-input').forEach(input => {
                 input.addEventListener('input', updateTotals);
                 input.addEventListener('input', validateInput);
             });
             
-            // Calculate initial totals
             updateTotals();
-        }
-        
-        // Update group and category names from inputs
-        function updateGroupAndCategoryNames() {
-            groupNames = [];
-            categoryNames = [];
-            
-            for (let i = 0; i < groups; i++) {
-                const input = document.getElementById(`group-${i}`);
-                groupNames.push(input ? input.value || `Group ${i+1}` : `Group ${i+1}`);
-            }
-            
-            for (let j = 0; j < categories; j++) {
-                const input = document.getElementById(`category-${j}`);
-                categoryNames.push(input ? input.value || `Category ${j+1}` : `Category ${j+1}`);
-            }
         }
         
         // Update row, column, and grand totals
         function updateTotals() {
-            // Reset totals
             rowTotals = new Array(groups).fill(0);
             columnTotals = new Array(categories).fill(0);
             grandTotal = 0;
             
-            // Update observedData from inputs and calculate totals
             for (let i = 0; i < groups; i++) {
                 for (let j = 0; j < categories; j++) {
                     const input = document.getElementById(`cell-${i}-${j}`);
@@ -1197,7 +1338,6 @@
                 }
             }
             
-            // Update total displays
             for (let i = 0; i < groups; i++) {
                 const rowTotalElement = document.getElementById(`row-total-${i}`);
                 if (rowTotalElement) rowTotalElement.textContent = rowTotals[i];
@@ -1220,7 +1360,7 @@
             if (isNaN(value) || value < 0) {
                 input.value = 0;
             } else {
-                input.value = Math.floor(value); // Ensure integer
+                input.value = Math.floor(value);
             }
         }
         
@@ -1265,27 +1405,20 @@
         
         // Get critical value from table
         function getCriticalValue(df, alpha) {
-            // If df is in our table, return the value
             if (chiSquareTable[df] && chiSquareTable[df][alpha]) {
                 return chiSquareTable[df][alpha];
             }
             
-            // For dfs not in our table, we'll use interpolation or approximation
-            // This is a simplified approximation for educational purposes
             const dfs = Object.keys(chiSquareTable).map(Number).sort((a, b) => a - b);
             
-            // If df is smaller than the smallest in table
             if (df < dfs[0]) {
                 return chiSquareTable[dfs[0]][alpha];
             }
             
-            // If df is larger than the largest in table
             if (df > dfs[dfs.length - 1]) {
-                // Use the largest available df
                 return chiSquareTable[dfs[dfs.length - 1]][alpha];
             }
             
-            // Find the closest df in the table
             let closestDF = dfs[0];
             for (let i = 0; i < dfs.length; i++) {
                 if (Math.abs(dfs[i] - df) < Math.abs(closestDF - df)) {
@@ -1308,14 +1441,12 @@
             
             const table = document.createElement('table');
             
-            // Create header row
             let headerRow = '<thead><tr><th></th>';
             for (let j = 0; j < categories; j++) {
                 headerRow += `<th>${categoryNames[j]}</th>`;
             }
             headerRow += '</tr></thead>';
             
-            // Create table body
             let tableBody = '<tbody>';
             for (let i = 0; i < groups; i++) {
                 tableBody += `<tr><th>${groupNames[i]}</th>`;
@@ -1335,7 +1466,6 @@
         
         // Update results display
         function updateResultsDisplay() {
-            // Ensure totals are up to date and calculate needed values
             updateTotals();
             calculateExpectedFrequencies();
             const chiSquare = calculateChiSquare();
@@ -1343,12 +1473,10 @@
             const alpha = parseFloat(document.getElementById('significance-level').value);
             const criticalValue = getCriticalValue(df, alpha);
             
-            // Update display
             document.getElementById('chi-square-value').textContent = chiSquare.toFixed(4);
             document.getElementById('degrees-of-freedom').textContent = df;
             document.getElementById('critical-value').textContent = criticalValue.toFixed(4);
             
-            // Determine significance by comparing computed χ² to critical value
             const comparisonText = document.getElementById('comparison-text');
             const comparisonDetails = document.getElementById('comparison-details');
             const resultText = document.getElementById('result-text');
@@ -1360,7 +1488,6 @@
                 resultText.textContent = 'Not calculated yet';
                 significanceIndicator.classList.add('hidden');
             } else {
-                // Compare computed χ² to critical value
                 const isSignificant = chiSquare >= criticalValue;
                 
                 if (isSignificant) {
@@ -1379,28 +1506,17 @@
                     significanceIndicator.classList.remove('hidden');
                 }
                 
-                // Update interpretation
                 const interpretationText = document.getElementById('interpretation-text');
                 if (isSignificant) {
-                    interpretationText.textContent = `The chi-square test result is statistically significant at α = ${alpha}. Since the computed χ² (${chiSquare.toFixed(4)}) is greater than or equal to the critical value (${criticalValue.toFixed(4)}), we reject the null hypothesis. This suggests there is a relationship between the variables. The observed frequencies differ significantly from what would be expected if there were no relationship.`;
+                    interpretationText.textContent = `The chi-square test result is statistically significant at α = ${alpha}. Since the computed χ² (${chiSquare.toFixed(4)}) is greater than or equal to the critical value (${criticalValue.toFixed(4)}), we reject the null hypothesis. This suggests there is a relationship between the variables.`;
                 } else {
-                    interpretationText.textContent = `The chi-square test result is not statistically significant at α = ${alpha}. Since the computed χ² (${chiSquare.toFixed(4)}) is less than the critical value (${criticalValue.toFixed(4)}), we fail to reject the null hypothesis. This suggests there is no significant relationship between the variables. Any differences between observed and expected frequencies could be due to random chance.`;
+                    interpretationText.textContent = `The chi-square test result is not statistically significant at α = ${alpha}. Since the computed χ² (${chiSquare.toFixed(4)}) is less than the critical value (${criticalValue.toFixed(4)}), we fail to reject the null hypothesis. This suggests there is no significant relationship between the variables.`;
                 }
             }
             
-            // Display expected frequencies
             displayExpectedFrequencies();
-            
-            // Display detailed breakdown table of χ² contributions
             displayBreakdownTable();
-            // Make sure breakdown container is visible
-            const bd = document.getElementById('breakdown-table-container');
-            if (bd) bd.style.display = 'block';
-
-            // Display observed data table in results
             displayObservedTableInResults();
-
-            // Highlight the critical value in the table
             highlightCriticalValue(df, alpha);
         }
         
@@ -1417,14 +1533,12 @@
             const table = document.createElement('table');
             table.style.marginTop = '10px';
 
-            // Header row with category names
             let html = '<thead><tr><th></th>';
             for (let j = 0; j < categories; j++) {
                 html += `<th>${categoryNames[j] || `Category ${j+1}`}</th>`;
             }
             html += '<th>Row Total</th></tr></thead>';
 
-            // Body rows
             html += '<tbody>';
             for (let i = 0; i < groups; i++) {
                 html += `<tr><th>${groupNames[i] || `Group ${i+1}`}</th>`;
@@ -1437,7 +1551,6 @@
                 html += `<td style="font-weight:700;">${rowTotals[i]}</td></tr>`;
             }
 
-            // Column totals row
             html += '<tr><th>Column Total</th>';
             for (let j = 0; j < categories; j++) {
                 html += `<td style="font-weight:700;">${columnTotals[j]}</td>`;
@@ -1449,7 +1562,7 @@
             container.appendChild(table);
         }
 
-        // Display detailed breakdown table showing O, E, O-E and (O-E)^2 / E per cell
+        // Display detailed breakdown table
         function displayBreakdownTable() {
             const container = document.getElementById('breakdown-table-container');
             container.innerHTML = '';
@@ -1457,9 +1570,7 @@
             const table = document.createElement('table');
             table.style.marginTop = '10px';
             table.style.width = '100%';
-            table.style.borderCollapse = 'collapse';
 
-            // Header
             let html = '<thead><tr style="background:#f1f3f5;"><th style="padding:8px;">Group</th><th style="padding:8px;">Category</th><th style="padding:8px;">Observed (O)</th><th style="padding:8px;">Expected (E)</th><th style="padding:8px;">O - E</th><th style="padding:8px;">(O - E)² / E</th></tr></thead>';
             html += '<tbody>';
 
@@ -1476,8 +1587,6 @@
                     if (exp > 0) {
                         contrib = Math.pow(diff, 2) / exp;
                         contribText = contrib.toFixed(2);
-                    } else {
-                        contribText = '0.00';
                     }
 
                     totalChi += contrib;
@@ -1486,7 +1595,6 @@
                 }
             }
 
-            // Total row
             html += `<tr style="font-weight:700;background:#f8f9fb;"><td colspan="5" style="padding:8px;">Total χ²</td><td style="padding:8px;">${totalChi.toFixed(2)}</td></tr>`;
 
             html += '</tbody>';
@@ -1501,7 +1609,6 @@
                 return;
             }
             
-            // Get all the data we need for the report
             const chiSquare = parseFloat(document.getElementById('chi-square-value').textContent);
             const df = parseInt(document.getElementById('degrees-of-freedom').textContent);
             const criticalValue = parseFloat(document.getElementById('critical-value').textContent);
@@ -1511,12 +1618,10 @@
             const interpretationText = document.getElementById('interpretation-text').textContent;
             const alpha = document.getElementById('significance-level').value;
             
-            // Get current date and time
             const now = new Date();
             const dateStr = now.toLocaleDateString();
             const timeStr = now.toLocaleTimeString();
             
-            // Create Word document content
             const content = `
             <!DOCTYPE html>
             <html>
@@ -1606,10 +1711,7 @@
             </html>
             `;
             
-            // Create a Blob with the HTML content
             const blob = new Blob([content], { type: 'application/msword' });
-            
-            // Create download link
             const link = document.createElement('a');
             const fileName = `ChiSquare_Results_${dateStr.replace(/\//g, '-')}_${timeStr.replace(/:/g, '-')}.doc`;
             
@@ -1617,36 +1719,32 @@
             link.download = fileName;
             link.click();
             
-            // Clean up
             URL.revokeObjectURL(link.href);
         }
         
         // Navigate between steps
         function goToStep(step) {
-            // Hide all steps
-            step1Section.classList.remove('active');
-            step2Section.classList.remove('active');
-            step3Section.classList.remove('active');
+            document.querySelectorAll('.input-section').forEach(section => {
+                section.classList.remove('active');
+            });
             
-            // Remove active class from all step indicators
-            step1Indicator.classList.remove('active', 'completed');
-            step2Indicator.classList.remove('active', 'completed');
-            step3Indicator.classList.remove('active', 'completed');
+            document.querySelectorAll('.step').forEach(stepEl => {
+                stepEl.classList.remove('active', 'completed');
+            });
             
-            // Show the selected step
             if (step === 1) {
-                step1Section.classList.add('active');
-                step1Indicator.classList.add('active');
+                document.getElementById('step1').classList.add('active');
+                document.getElementById('step1-indicator').classList.add('active');
             } else if (step === 2) {
-                step2Section.classList.add('active');
-                step2Indicator.classList.add('active');
-                step1Indicator.classList.add('completed');
+                document.getElementById('step2').classList.add('active');
+                document.getElementById('step2-indicator').classList.add('active');
+                document.getElementById('step1-indicator').classList.add('completed');
                 createDataTable();
             } else if (step === 3) {
-                step3Section.classList.add('active');
-                step3Indicator.classList.add('active');
-                step1Indicator.classList.add('completed');
-                step2Indicator.classList.add('completed');
+                document.getElementById('step3').classList.add('active');
+                document.getElementById('step3-indicator').classList.add('active');
+                document.getElementById('step1-indicator').classList.add('completed');
+                document.getElementById('step2-indicator').classList.add('completed');
                 updateResultsDisplay();
             }
             
@@ -1655,12 +1753,18 @@
         
         // PWA Installation Setup
         function setupPWA() {
-            // Register service worker
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('sw.js')
                         .then(registration => {
-                            console.log('ServiceWorker registered:', registration);
+                            registration.addEventListener('updatefound', () => {
+                                const newWorker = registration.installing;
+                                newWorker.addEventListener('statechange', () => {
+                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        showUpdateNotification();
+                                    }
+                                });
+                            });
                         })
                         .catch(error => {
                             console.log('ServiceWorker registration failed:', error);
@@ -1668,48 +1772,53 @@
                 });
             }
             
-            // Listen for beforeinstallprompt event
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
+                document.getElementById('install-button').style.display = 'block';
+                document.getElementById('mobile-install-btn').style.display = 'flex';
                 
-                // Show install buttons
-                installButton.style.display = 'block';
-                mobileInstallBtn.style.display = 'flex';
-                
-                // Update mobile install button text
                 if (isRunningStandalone()) {
-                    mobileInstallBtn.innerHTML = '<i class="fas fa-check"></i> App Installed';
-                    mobileInstallBtn.disabled = true;
-                    mobileInstallBtn.style.opacity = '0.7';
+                    document.getElementById('mobile-install-btn').innerHTML = '<i class="fas fa-check"></i> App Installed';
+                    document.getElementById('mobile-install-btn').disabled = true;
+                    document.getElementById('mobile-install-btn').style.opacity = '0.7';
                 }
             });
             
-            // Listen for appinstalled event
             window.addEventListener('appinstalled', (evt) => {
-                console.log('App installed successfully');
                 deferredPrompt = null;
-                installButton.style.display = 'none';
-                mobileInstallBtn.innerHTML = '<i class="fas fa-check"></i> App Installed';
-                mobileInstallBtn.disabled = true;
-                mobileInstallBtn.style.opacity = '0.7';
+                document.getElementById('install-button').style.display = 'none';
+                document.getElementById('mobile-install-btn').innerHTML = '<i class="fas fa-check"></i> App Installed';
+                document.getElementById('mobile-install-btn').disabled = true;
+                document.getElementById('mobile-install-btn').style.opacity = '0.7';
             });
         }
         
         // Check if app is running in standalone mode
         function checkStandaloneMode() {
             if (isRunningStandalone()) {
-                console.log('App is running in standalone mode');
                 document.body.classList.add('standalone-mode');
-                mobileInstallBtn.innerHTML = '<i class="fas fa-check"></i> App Installed';
-                mobileInstallBtn.disabled = true;
-                mobileInstallBtn.style.opacity = '0.7';
+                document.getElementById('mobile-install-btn').innerHTML = '<i class="fas fa-check"></i> App Installed';
+                document.getElementById('mobile-install-btn').disabled = true;
+                document.getElementById('mobile-install-btn').style.opacity = '0.7';
             }
         }
         
         function isRunningStandalone() {
             return window.matchMedia('(display-mode: standalone)').matches || 
                    window.navigator.standalone === true;
+        }
+        
+        // Show update notification
+        function showUpdateNotification() {
+            if (confirm('A new version of the app is available. Reload to update?')) {
+                navigator.serviceWorker.getRegistration().then(registration => {
+                    if (registration && registration.waiting) {
+                        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                        window.location.reload();
+                    }
+                });
+            }
         }
         
         // Install app function
@@ -1719,7 +1828,6 @@
                 const { outcome } = await deferredPrompt.userChoice;
                 
                 if (outcome === 'accepted') {
-                    console.log('User accepted the install prompt');
                     deferredPrompt = null;
                 }
             }
@@ -1727,11 +1835,29 @@
         
         // Set up event listeners
         function setupEventListeners() {
+            // Start button event
+            startButton.addEventListener('click', startApp);
+            
+            // Also allow tapping/clicking on the entire start screen to start
+            startScreen.addEventListener('click', function(e) {
+                if (e.target === startScreen) {
+                    startApp();
+                }
+            });
+            
             // Step navigation
-            document.getElementById('num-groups').addEventListener('change', updateTableSizeControls);
-            document.getElementById('num-categories').addEventListener('change', updateTableSizeControls);
+            document.getElementById('num-groups').addEventListener('change', function() {
+                updateTableSizeControls();
+                updateGroupAndCategoryNames();
+            });
+            
+            document.getElementById('num-categories').addEventListener('change', function() {
+                updateTableSizeControls();
+                updateGroupAndCategoryNames();
+            });
             
             document.getElementById('next-step1').addEventListener('click', function() {
+                updateGroupAndCategoryNames();
                 goToStep(2);
             });
             
@@ -1748,13 +1874,11 @@
             });
             
             document.getElementById('new-calculation-btn').addEventListener('click', function() {
-                // Reset data
                 observedData = [];
                 goToStep(1);
             });
             
             document.getElementById('clear-table-btn').addEventListener('click', function() {
-                // Clear all data inputs
                 document.querySelectorAll('.data-input').forEach(input => {
                     input.value = '0';
                 });
@@ -1762,7 +1886,6 @@
             });
             
             document.getElementById('auto-fill-btn').addEventListener('click', function() {
-                // Fill with random data
                 for (let i = 0; i < groups; i++) {
                     for (let j = 0; j < categories; j++) {
                         const randomValue = Math.floor(Math.random() * 50) + 1;
@@ -1783,19 +1906,19 @@
             document.getElementById('download-results-btn').addEventListener('click', downloadResultsAsWord);
             
             // Install buttons
-            installButton.addEventListener('click', installApp);
-            mobileInstallBtn.addEventListener('click', installApp);
+            document.getElementById('install-button').addEventListener('click', installApp);
+            document.getElementById('mobile-install-btn').addEventListener('click', installApp);
             
             // Step indicator click events
-            step1Indicator.addEventListener('click', function() {
+            document.getElementById('step1-indicator').addEventListener('click', function() {
                 goToStep(1);
             });
             
-            step2Indicator.addEventListener('click', function() {
+            document.getElementById('step2-indicator').addEventListener('click', function() {
                 if (currentStep > 1) goToStep(2);
             });
             
-            step3Indicator.addEventListener('click', function() {
+            document.getElementById('step3-indicator').addEventListener('click', function() {
                 if (currentStep > 2) goToStep(3);
             });
             
