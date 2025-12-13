@@ -16,7 +16,7 @@
   
   "icons": [
     {
-      "src": "CHilogo.png",
+      "src": "CHIlogo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -42,4 +42,5 @@
   "prefer_related_applications": false,
   "related_applications": []
 }
+
 
