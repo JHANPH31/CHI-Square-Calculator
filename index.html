@@ -21,8 +21,6 @@
     
     <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <style>
         * {
@@ -62,26 +60,27 @@
         }
         
         /* START SCREEN - Fullscreen image background */
-        .start-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-image: url('chiLAPPYY.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            margin: 0;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-            overflow: hidden;
-        }
+        /* In your CSS section, update the start-screen background */
+.start-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('chiLAPPYy.png'); /* or chiPHONEE.png */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    overflow: hidden;
+}
         
         .start-screen.hidden {
             opacity: 0;
@@ -604,6 +603,55 @@
             display: none;
         }
         
+        /* PWA Install Prompt */
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--primary-1), var(--primary-2));
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideUp 0.3s ease;
+            max-width: 90%;
+        }
+        
+        .install-prompt.hidden {
+            display: none;
+        }
+        
+        .install-prompt-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .install-prompt-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+        
         /* Mobile Styles */
         @media (max-width: 768px) {
             .start-button {
@@ -662,6 +710,13 @@
                 padding: 10px 16px;
                 font-size: 14px;
             }
+            
+            .install-prompt {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+                border-radius: 20px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -682,10 +737,44 @@
     </style>
 </head>
 <body>
-    <!-- START SCREEN with chiLAPPY.png as background -->
+    <!-- START SCREEN -->
     <div class="start-screen" id="startScreen">
+        <div style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 20px;
+            box-sizing: border-box;
+        ">
+            
+        </div>
         <button class="start-button" id="startButton">
             START
+        </button>
+    </div>
+    
+    <!-- PWA Install Prompt -->
+    <div class="install-prompt hidden" id="installPrompt">
+        <div class="install-prompt-content">
+            <i class="fas fa-mobile-alt fa-2x"></i>
+            <div>
+                <strong>Install Chi-Square Calculator</strong>
+                <p style="font-size: 0.9rem; opacity: 0.9; margin-top: 2px;">Use it offline like a real app!</p>
+            </div>
+        </div>
+        <button class="btn btn-primary" id="installPromptButton" style="padding: 8px 20px;">
+            <i class="fas fa-download"></i> Install
+        </button>
+        <button class="install-prompt-close" id="closeInstallPrompt">
+            <i class="fas fa-times"></i>
         </button>
     </div>
     
@@ -702,7 +791,7 @@
                         <span class="title-accent">SQUARE</span>
                     </h1>
                     <p class="subtitle">TEST OF INDEPENDENCE CALCULATOR</p>
-                    <p class="version"></p>
+                    
                 </div>
             </div>
         </header>
@@ -909,6 +998,9 @@
                     <button class="btn btn-primary" id="mobile-install-btn" style="width: 100%; margin-top: 10px;">
                         <i class="fas fa-download"></i> Install App
                     </button>
+                    <p style="font-size: 0.8rem; color: #666; text-align: center; margin-top: 8px; display: none;" id="already-installed-message">
+                        <i class="fas fa-check-circle"></i> App is installed
+                    </p>
                 </div>
             </div>
         </div>
@@ -918,10 +1010,12 @@
             <p>Works offline • Installable • No app store required</p>
         </footer>
         
-        <button id="install-button" style="display: none;">📱 Install App</button>
+        <button id="install-button" style="display: none;">
+            <i class="fas fa-download"></i> Install App
+        </button>
     </div>
     
-    <script>
+   <script>
         // State variables
         let currentStep = 1;
         let groups = 3;
@@ -934,6 +1028,7 @@
         let columnTotals = [];
         let grandTotal = 0;
         let deferredPrompt = null;
+        let installPromptShown = false;
         
         // Chi-Square Critical Values Table
         const chiSquareTable = {
@@ -956,49 +1051,21 @@
             17: {0.10: 24.769, 0.05: 27.587, 0.025: 30.191, 0.01: 33.409},
             18: {0.10: 25.989, 0.05: 28.869, 0.025: 31.526, 0.01: 34.805},
             19: {0.10: 27.204, 0.05: 30.144, 0.025: 32.852, 0.01: 36.191},
-            20: {0.10: 28.412, 0.05: 31.410, 0.025: 34.170, 0.01: 37.566},
-            21: {0.10: 29.615, 0.05: 32.671, 0.025: 35.479, 0.01: 38.932},
-            22: {0.10: 30.813, 0.05: 33.924, 0.025: 36.781, 0.01: 40.289},
-            23: {0.10: 32.007, 0.05: 35.172, 0.025: 38.076, 0.01: 41.638},
-            24: {0.10: 33.196, 0.05: 36.415, 0.025: 39.364, 0.01: 42.980},
-            25: {0.10: 34.382, 0.05: 37.652, 0.025: 40.646, 0.01: 44.314},
-            26: {0.10: 35.563, 0.05: 38.885, 0.025: 41.923, 0.01: 45.642},
-            27: {0.10: 36.741, 0.05: 40.113, 0.025: 43.195, 0.01: 46.963},
-            28: {0.10: 37.916, 0.05: 41.337, 0.025: 44.461, 0.01: 48.278},
-            29: {0.10: 39.087, 0.05: 42.557, 0.025: 45.722, 0.01: 49.588},
-            30: {0.10: 40.256, 0.05: 43.773, 0.025: 46.979, 0.01: 50.892},
-            40: {0.10: 51.805, 0.05: 55.758, 0.025: 59.342, 0.01: 63.691},
-            50: {0.10: 63.167, 0.05: 67.505, 0.025: 71.420, 0.01: 76.154},
-            60: {0.10: 74.397, 0.05: 79.082, 0.025: 83.298, 0.01: 88.379},
-            70: {0.10: 85.527, 0.05: 90.531, 0.025: 95.023, 0.01: 100.425},
-            80: {0.10: 96.578, 0.05: 101.879, 0.025: 106.629, 0.01: 112.329},
-            100: {0.10: 107.565, 0.05: 113.145, 0.025: 118.136, 0.01: 124.116},
-            1000: {0.10: 118.498, 0.05: 124.342, 0.025: 129.561, 0.01: 135.807}
+            20: {0.10: 28.412, 0.05: 31.410, 0.025: 34.170, 0.01: 37.566}
         };
         
         // DOM Elements
         const startScreen = document.getElementById('startScreen');
         const startButton = document.getElementById('startButton');
         const appContent = document.getElementById('appContent');
+        const installPrompt = document.getElementById('installPrompt');
+        const installPromptButton = document.getElementById('installPromptButton');
+        const closeInstallPrompt = document.getElementById('closeInstallPrompt');
         
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            // Add fallback for image loading
-            const bgImage = new Image();
-            bgImage.src = 'chiLAPPYY.png';
-            
-            bgImage.onerror = function() {
-                console.log('chiLAPPYY.png not found, trying chiLAPPY.png');
-                startScreen.style.backgroundImage = "url('chiLAPPYY.png')";
-                
-                const fallbackImage = new Image();
-                fallbackImage.src = 'chiLAPPYY.png';
-                
-                fallbackImage.onerror = function() {
-                    console.log('Images not found, showing text fallback');
-                    showImageFallback();
-                };
-            };
+            // Set up appropriate background image
+            setupStartScreenBackground();
             
             initializeGroupNames();
             initializeCategoryNames();
@@ -1010,46 +1077,54 @@
             checkStandaloneMode();
         });
         
-        // Fallback if images don't load
-        function showImageFallback() {
-            startScreen.style.backgroundImage = "none";
-            startScreen.style.background = "linear-gradient(135deg, var(--primary-2) 0%, var(--primary-1) 100%)";
-            startScreen.innerHTML = `
-                <div style="
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    text-align: center;
-                    color: white;
-                    padding: 20px;
-                    box-sizing: border-box;
-                ">
-                    <div style="font-size: 6rem; font-weight: bold; margin-bottom: 30px; color: var(--accent);">
-                        X²
-                    </div>
-                    <div style="font-size: 4.5rem; font-weight: 800; letter-spacing: 4px; margin-bottom: 15px;">
-                        CHI-V
-                    </div>
-                    <div style="font-size: 4rem; font-weight: 800; color: var(--accent); margin-bottom: 30px; letter-spacing: 3px;">
-                        SQUARE
-                    </div>
-                    <div style="font-size: 3rem; font-weight: 600; margin-bottom: 50px;">
-                        CALCULATOR
-                    </div>
-                </div>
-                <button class="start-button" id="startButton">
-                    START
-                </button>
-            `;
+        // Detect device type and load appropriate background image
+        function setupStartScreenBackground() {
+            const startScreen = document.getElementById('startScreen');
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const isTablet = /iPad|Tablet|Silk|Kindle|PlayBook/.test(navigator.userAgent) || 
+                           (window.innerWidth <= 1024 && window.innerWidth >= 768);
             
-            // Re-attach the start button event listener
-            document.getElementById('startButton').addEventListener('click', startApp);
+            let imageToLoad = '';
+            
+            // Determine which image to use based on device
+            if (isMobile) {
+                imageToLoad = 'chiPHONEE.png'; // Mobile version
+                startScreen.classList.add('mobile-bg');
+            } else if (isTablet) {
+                imageToLoad = 'chiLAPPY.png'; // Tablet version (use laptop image or create tablet one)
+                startScreen.classList.add('tablet-bg');
+            } else {
+                imageToLoad = 'chiLAPPY.png'; // Desktop version
+                startScreen.classList.add('desktop-bg');
+            }
+            
+            // Test if the image exists
+            const img = new Image();
+            img.onload = function() {
+                console.log(`Loaded ${imageToLoad} for ${isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop'} device`);
+                // Add class to indicate we have an image
+                startScreen.classList.add('has-image');
+                
+                // Optional: Make text more visible on image
+                const content = document.querySelector('.start-screen-content');
+                if (content) {
+                    content.style.background = 'rgba(0, 0, 0, 0.6)';
+                }
+            };
+            
+            img.onerror = function() {
+                console.log(`${imageToLoad} not found, using gradient background`);
+                // Remove image classes if image doesn't exist
+                startScreen.classList.remove('mobile-bg', 'desktop-bg', 'tablet-bg', 'has-image');
+                
+                // Make overlay lighter for gradient background
+                const content = document.querySelector('.start-screen-content');
+                if (content) {
+                    content.style.background = 'rgba(0, 0, 0, 0.3)';
+                }
+            };
+            
+            img.src = imageToLoad;
         }
         
         // Start the app
@@ -1061,42 +1136,52 @@
             setTimeout(() => {
                 appContent.classList.add('visible');
                 startScreen.style.display = 'none';
+                
                 // Re-enable scrolling for the app content
                 document.body.style.overflow = 'auto';
                 document.documentElement.style.overflow = 'auto';
+                
+                // Show install prompt after delay
+                setTimeout(() => {
+                    showInstallPromptIfEligible();
+                }, 1000);
             }, 500);
         }
         
         // Initialize group names inputs
         function initializeGroupNames() {
             const container = document.getElementById('group-names-container');
-            const hint = container.querySelector('.input-hint');
-            container.innerHTML = '';
-            if (hint) container.appendChild(hint);
+            const existingHint = container.querySelector('.input-hint');
+            
+            // Clear container but keep the hint
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+            
+            if (existingHint) {
+                container.appendChild(existingHint);
+            } else {
+                // Create hint if it doesn't exist
+                const hint = document.createElement('div');
+                hint.className = 'input-hint';
+                hint.textContent = 'Enter names for your groups (e.g., Male, Female, LGBTQ+)';
+                container.appendChild(hint);
+            }
             
             const wrapper = document.createElement('div');
             wrapper.className = 'input-group-wrapper';
             
             for (let i = 0; i < 5; i++) {
                 const div = document.createElement('div');
-                div.style.display = 'flex';
-                div.style.alignItems = 'center';
-                div.style.gap = '12px';
-                div.style.padding = '8px 0';
                 
                 const label = document.createElement('div');
                 label.textContent = `Group ${i+1}`;
-                label.style.minWidth = '80px';
-                label.style.fontWeight = '600';
-                label.style.color = '#333';
                 
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.id = `group-${i}`;
                 input.placeholder = `Enter name for Group ${i+1}`;
                 input.value = i < groupNames.length && groupNames[i] ? groupNames[i] : '';
-                input.style.flex = '1';
-                input.style.padding = '10px 12px';
                 input.classList.add('group-name-input');
                 
                 div.appendChild(label);
@@ -1115,33 +1200,37 @@
         // Initialize category names inputs
         function initializeCategoryNames() {
             const container = document.getElementById('category-names-container');
-            const hint = container.querySelector('.input-hint');
-            container.innerHTML = '';
-            if (hint) container.appendChild(hint);
+            const existingHint = container.querySelector('.input-hint');
+            
+            // Clear container but keep the hint
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+            
+            if (existingHint) {
+                container.appendChild(existingHint);
+            } else {
+                // Create hint if it doesn't exist
+                const hint = document.createElement('div');
+                hint.className = 'input-hint';
+                hint.textContent = 'Enter names for your categories (e.g., 80-85, 86-90, 91-95, 96-100)';
+                container.appendChild(hint);
+            }
             
             const wrapper = document.createElement('div');
             wrapper.className = 'input-group-wrapper';
             
             for (let i = 0; i < 5; i++) {
                 const div = document.createElement('div');
-                div.style.display = 'flex';
-                div.style.alignItems = 'center';
-                div.style.gap = '12px';
-                div.style.padding = '8px 0';
                 
                 const label = document.createElement('div');
                 label.textContent = `Category ${i+1}`;
-                label.style.minWidth = '80px';
-                label.style.fontWeight = '600';
-                label.style.color = '#333';
                 
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.id = `category-${i}`;
                 input.placeholder = `Enter name for Category ${i+1}`;
                 input.value = i < categoryNames.length && categoryNames[i] ? categoryNames[i] : '';
-                input.style.flex = '1';
-                input.style.padding = '10px 12px';
                 input.classList.add('category-name-input');
                 
                 div.appendChild(label);
@@ -1165,6 +1254,7 @@
             groups = parseInt(numGroupsSelect.value);
             categories = parseInt(numCategoriesSelect.value);
             
+            // Update group inputs visibility
             const groupWrapper = document.querySelector('#group-names-container .input-group-wrapper');
             if (groupWrapper) {
                 const groupDivs = groupWrapper.children;
@@ -1173,6 +1263,7 @@
                 }
             }
             
+            // Update category inputs visibility
             const categoryWrapper = document.querySelector('#category-names-container .input-group-wrapper');
             if (categoryWrapper) {
                 const categoryDivs = categoryWrapper.children;
@@ -1211,7 +1302,7 @@
             const tableBody = document.getElementById('critical-value-table-body');
             tableBody.innerHTML = '';
             
-            const dfsToShow = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30, 40, 50];
+            const dfsToShow = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
             
             dfsToShow.forEach(df => {
                 const row = document.createElement('tr');
@@ -1240,33 +1331,6 @@
             });
         }
         
-        // Highlight the current critical value in the table
-        function highlightCriticalValue(df, alpha) {
-            document.querySelectorAll('.critical-value-table td').forEach(cell => {
-                cell.classList.remove('highlight');
-            });
-            
-            const rows = document.querySelectorAll('#critical-value-table-body tr');
-            
-            rows.forEach(row => {
-                const dfCell = row.querySelector('td:first-child');
-                if (dfCell && parseInt(dfCell.textContent) === df) {
-                    let alphaIndex;
-                    if (alpha === 0.10) alphaIndex = 1;
-                    else if (alpha === 0.05) alphaIndex = 2;
-                    else if (alpha === 0.025) alphaIndex = 3;
-                    else if (alpha === 0.01) alphaIndex = 4;
-                    
-                    if (alphaIndex) {
-                        const targetCell = row.querySelector(`td:nth-child(${alphaIndex + 1})`);
-                        if (targetCell) {
-                            targetCell.classList.add('highlight');
-                        }
-                    }
-                }
-            });
-        }
-        
         // Create the data entry table
         function createDataTable() {
             updateGroupAndCategoryNames();
@@ -1277,12 +1341,14 @@
             const table = document.createElement('table');
             table.id = 'data-table';
             
+            // Create header row
             let headerRow = '<thead><tr><th></th>';
             for (let j = 0; j < categories; j++) {
                 headerRow += `<th>${categoryNames[j] || `Category ${j+1}`}</th>`;
             }
             headerRow += '<th>Row Total</th></tr></thead>';
             
+            // Create body rows
             let tableBody = '<tbody>';
             for (let i = 0; i < groups; i++) {
                 tableBody += `<tr><th>${groupNames[i] || `Group ${i+1}`}</th>`;
@@ -1301,6 +1367,7 @@
                 tableBody += `<td id="row-total-${i}" class="row-total">0</td></tr>`;
             }
             
+            // Create totals row
             tableBody += '<tr><th>Column Total</th>';
             for (let j = 0; j < categories; j++) {
                 tableBody += `<td id="col-total-${j}" class="col-total">0</td>`;
@@ -1311,6 +1378,7 @@
             table.innerHTML = headerRow + tableBody;
             container.appendChild(table);
             
+            // Add event listeners
             document.querySelectorAll('.data-input').forEach(input => {
                 input.addEventListener('input', updateTotals);
                 input.addEventListener('input', validateInput);
@@ -1338,16 +1406,19 @@
                 }
             }
             
+            // Update row totals display
             for (let i = 0; i < groups; i++) {
                 const rowTotalElement = document.getElementById(`row-total-${i}`);
                 if (rowTotalElement) rowTotalElement.textContent = rowTotals[i];
             }
             
+            // Update column totals display
             for (let j = 0; j < categories; j++) {
                 const colTotalElement = document.getElementById(`col-total-${j}`);
                 if (colTotalElement) colTotalElement.textContent = columnTotals[j];
             }
             
+            // Update grand total display
             const grandTotalElement = document.getElementById('grand-total');
             if (grandTotalElement) grandTotalElement.textContent = grandTotal;
         }
@@ -1409,16 +1480,18 @@
                 return chiSquareTable[df][alpha];
             }
             
+            // If df not in table, return the closest available
             const dfs = Object.keys(chiSquareTable).map(Number).sort((a, b) => a - b);
             
-            if (df < dfs[0]) {
+            if (df <= dfs[0]) {
                 return chiSquareTable[dfs[0]][alpha];
             }
             
-            if (df > dfs[dfs.length - 1]) {
+            if (df >= dfs[dfs.length - 1]) {
                 return chiSquareTable[dfs[dfs.length - 1]][alpha];
             }
             
+            // Find closest df
             let closestDF = dfs[0];
             for (let i = 0; i < dfs.length; i++) {
                 if (Math.abs(dfs[i] - df) < Math.abs(closestDF - df)) {
@@ -1443,13 +1516,13 @@
             
             let headerRow = '<thead><tr><th></th>';
             for (let j = 0; j < categories; j++) {
-                headerRow += `<th>${categoryNames[j]}</th>`;
+                headerRow += `<th>${categoryNames[j] || `Category ${j+1}`}</th>`;
             }
             headerRow += '</tr></thead>';
             
             let tableBody = '<tbody>';
             for (let i = 0; i < groups; i++) {
-                tableBody += `<tr><th>${groupNames[i]}</th>`;
+                tableBody += `<tr><th>${groupNames[i] || `Group ${i+1}`}</th>`;
                 
                 for (let j = 0; j < categories; j++) {
                     const expected = expectedData[i][j];
@@ -1473,6 +1546,7 @@
             const alpha = parseFloat(document.getElementById('significance-level').value);
             const criticalValue = getCriticalValue(df, alpha);
             
+            // Update UI elements
             document.getElementById('chi-square-value').textContent = chiSquare.toFixed(4);
             document.getElementById('degrees-of-freedom').textContent = df;
             document.getElementById('critical-value').textContent = criticalValue.toFixed(4);
@@ -1506,6 +1580,7 @@
                     significanceIndicator.classList.remove('hidden');
                 }
                 
+                // Update interpretation
                 const interpretationText = document.getElementById('interpretation-text');
                 if (isSignificant) {
                     interpretationText.textContent = `The chi-square test result is statistically significant at α = ${alpha}. Since the computed χ² (${chiSquare.toFixed(4)}) is greater than or equal to the critical value (${criticalValue.toFixed(4)}), we reject the null hypothesis. This suggests there is a relationship between the variables.`;
@@ -1514,10 +1589,10 @@
                 }
             }
             
+            // Update other displays
             displayExpectedFrequencies();
             displayBreakdownTable();
             displayObservedTableInResults();
-            highlightCriticalValue(df, alpha);
         }
         
         // Display observed data table in results
@@ -1531,7 +1606,6 @@
             }
 
             const table = document.createElement('table');
-            table.style.marginTop = '10px';
 
             let html = '<thead><tr><th></th>';
             for (let j = 0; j < categories; j++) {
@@ -1544,7 +1618,7 @@
                 html += `<tr><th>${groupNames[i] || `Group ${i+1}`}</th>`;
 
                 for (let j = 0; j < categories; j++) {
-                    const value = (observedData[i] && observedData[i][j]) ? observedData[i][j] : 0;
+                    const value = observedData[i][j] || 0;
                     html += `<td>${value}</td>`;
                 }
 
@@ -1568,18 +1642,17 @@
             container.innerHTML = '';
 
             const table = document.createElement('table');
-            table.style.marginTop = '10px';
             table.style.width = '100%';
 
-            let html = '<thead><tr style="background:#f1f3f5;"><th style="padding:8px;">Group</th><th style="padding:8px;">Category</th><th style="padding:8px;">Observed (O)</th><th style="padding:8px;">Expected (E)</th><th style="padding:8px;">O - E</th><th style="padding:8px;">(O - E)² / E</th></tr></thead>';
+            let html = '<thead><tr style="background:#f1f3f5;"><th>Group</th><th>Category</th><th>Observed (O)</th><th>Expected (E)</th><th>O - E</th><th>(O - E)² / E</th></tr></thead>';
             html += '<tbody>';
 
             let totalChi = 0;
 
             for (let i = 0; i < groups; i++) {
                 for (let j = 0; j < categories; j++) {
-                    const obs = (observedData[i] && typeof observedData[i][j] !== 'undefined') ? observedData[i][j] : 0;
-                    const exp = (expectedData[i] && typeof expectedData[i][j] !== 'undefined') ? expectedData[i][j] : 0;
+                    const obs = observedData[i][j] || 0;
+                    const exp = expectedData[i][j] || 0;
                     const diff = obs - exp;
                     let contrib = 0;
                     let contribText = '0.00';
@@ -1591,143 +1664,35 @@
 
                     totalChi += contrib;
 
-                    html += `<tr style="border-top:1px solid #e9ecef;"><td style="padding:8px;text-align:left;">${groupNames[i] || `Group ${i+1}`}</td><td style="padding:8px;">${categoryNames[j] || `Category ${j+1}`}</td><td style="padding:8px;">${obs}</td><td style="padding:8px;">${exp.toFixed(2)}</td><td style="padding:8px;">${diff.toFixed(2)}</td><td style="padding:8px;">${contribText}</td></tr>`;
+                    html += `<tr style="border-top:1px solid #e9ecef;">
+                        <td>${groupNames[i] || `Group ${i+1}`}</td>
+                        <td>${categoryNames[j] || `Category ${j+1}`}</td>
+                        <td>${obs}</td>
+                        <td>${exp.toFixed(2)}</td>
+                        <td>${diff.toFixed(2)}</td>
+                        <td>${contribText}</td>
+                    </tr>`;
                 }
             }
 
-            html += `<tr style="font-weight:700;background:#f8f9fb;"><td colspan="5" style="padding:8px;">Total χ²</td><td style="padding:8px;">${totalChi.toFixed(2)}</td></tr>`;
+            html += `<tr style="font-weight:700;background:#f8f9fb;">
+                <td colspan="5">Total χ²</td>
+                <td>${totalChi.toFixed(2)}</td>
+            </tr>`;
 
             html += '</tbody>';
             table.innerHTML = html;
             container.appendChild(table);
         }
         
-        // Function to download results as Word document
-        function downloadResultsAsWord() {
-            if (grandTotal === 0) {
-                alert("Please enter data and calculate results first!");
-                return;
-            }
-            
-            const chiSquare = parseFloat(document.getElementById('chi-square-value').textContent);
-            const df = parseInt(document.getElementById('degrees-of-freedom').textContent);
-            const criticalValue = parseFloat(document.getElementById('critical-value').textContent);
-            const resultText = document.getElementById('result-text').textContent;
-            const comparisonText = document.getElementById('comparison-text').textContent;
-            const comparisonDetails = document.getElementById('comparison-details').textContent;
-            const interpretationText = document.getElementById('interpretation-text').textContent;
-            const alpha = document.getElementById('significance-level').value;
-            
-            const now = new Date();
-            const dateStr = now.toLocaleDateString();
-            const timeStr = now.toLocaleTimeString();
-            
-            const content = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>Chi-Square Test Results</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 40px; }
-                    h1 { color: #6a2fb2; border-bottom: 2px solid #ffc107; padding-bottom: 10px; }
-                    h2 { color: #8b3fb6; margin-top: 25px; }
-                    h3 { color: #182848; }
-                    table { border-collapse: collapse; width: 100%; margin: 15px 0; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-                    th { background-color: #f8f9fa; font-weight: bold; }
-                    .result-box { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; }
-                    .significance { font-weight: bold; padding: 5px 10px; border-radius: 3px; }
-                    .significant { background-color: #fff3cd; color: #856404; }
-                    .not-significant { background-color: #f8f9fa; color: #6c757d; }
-                    .footer { margin-top: 40px; font-size: 0.9em; color: #6c757d; border-top: 1px solid #ddd; padding-top: 15px; }
-                </style>
-            </head>
-            <body>
-                <h1>Chi-Square Test of Independence Results</h1>
-                <p><strong>Report Generated:</strong> ${dateStr} at ${timeStr}</p>
-                
-                <h2>1. Test Overview</h2>
-                <p>This report presents the results of a chi-square test of independence conducted to examine the relationship between ${groups} groups and ${categories} categories.</p>
-                
-                <h2>2. Observed Frequencies</h2>
-                ${document.getElementById('observed-table-display').innerHTML}
-                
-                <h2>3. Expected Frequencies</h2>
-                ${document.getElementById('expected-table-container').innerHTML}
-                
-                <h2>4. Chi-Square Calculation Details</h2>
-                ${document.getElementById('breakdown-table-container').innerHTML}
-                
-                <h2>5. Statistical Results</h2>
-                <div class="result-box">
-                    <table style="width: 70%;">
-                        <tr>
-                            <td style="text-align: left; width: 50%;"><strong>1. H₀ (Null Hypothesis):</strong></td>
-                            <td style="text-align: left;">${resultText === 'Significant' ? 'REJECTED' : 'ACCEPTED'}</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: left;"><strong>2. Degrees of Freedom (df):</strong></td>
-                            <td style="text-align: left;">${df}</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: left;"><strong>3. Significance Level (α):</strong></td>
-                            <td style="text-align: left;">${alpha}</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: left;"><strong>4. Critical Value:</strong></td>
-                            <td style="text-align: left;">${criticalValue.toFixed(4)}</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: left;"><strong>5. Computed χ² Value:</strong></td>
-                            <td style="text-align: left;">${chiSquare.toFixed(4)}</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: left;"><strong>6. Decision:</strong></td>
-                            <td style="text-align: left;">${comparisonText}</td>
-                        </tr>
-                    </table>
-                </div>
-                
-                <h2>6. Statistical Comparison</h2>
-                <p>${comparisonDetails}</p>
-                
-                <h2>7. Interpretation</h2>
-                <p>${interpretationText}</p>
-                
-                <h2>8. Critical Value Reference</h2>
-                <p>For degrees of freedom = ${df} and α = ${alpha}, the critical value from the chi-square distribution table is ${criticalValue.toFixed(4)}.</p>
-                
-                <div class="footer">
-                    <p><strong>Notes:</strong></p>
-                    <ul>
-                        <li>The chi-square test assumes that observations are independent and expected frequencies are sufficiently large (typically ≥ 5).</li>
-                        <li>This analysis was performed using the Chi-Square Test of Independence Calculator.</li>
-                        <li>For important research analyses, consult with a qualified statistician.</li>
-                    </ul>
-                    <p>Generated by: Chi-Square Test Calculator | ${dateStr}</p>
-                </div>
-            </body>
-            </html>
-            `;
-            
-            const blob = new Blob([content], { type: 'application/msword' });
-            const link = document.createElement('a');
-            const fileName = `ChiSquare_Results_${dateStr.replace(/\//g, '-')}_${timeStr.replace(/:/g, '-')}.doc`;
-            
-            link.href = URL.createObjectURL(blob);
-            link.download = fileName;
-            link.click();
-            
-            URL.revokeObjectURL(link.href);
-        }
-        
         // Navigate between steps
         function goToStep(step) {
+            // Hide all sections
             document.querySelectorAll('.input-section').forEach(section => {
                 section.classList.remove('active');
             });
             
+            // Reset step indicators
             document.querySelectorAll('.step').forEach(stepEl => {
                 stepEl.classList.remove('active', 'completed');
             });
@@ -1753,18 +1718,12 @@
         
         // PWA Installation Setup
         function setupPWA() {
+            // Register Service Worker
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('sw.js')
                         .then(registration => {
-                            registration.addEventListener('updatefound', () => {
-                                const newWorker = registration.installing;
-                                newWorker.addEventListener('statechange', () => {
-                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                        showUpdateNotification();
-                                    }
-                                });
-                            });
+                            console.log('Service Worker registered successfully');
                         })
                         .catch(error => {
                             console.log('ServiceWorker registration failed:', error);
@@ -1772,35 +1731,36 @@
                 });
             }
             
+            // Handle PWA installation prompts
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
+                console.log('PWA install prompt available');
+                
+                // Show install buttons
                 document.getElementById('install-button').style.display = 'block';
                 document.getElementById('mobile-install-btn').style.display = 'flex';
-                
-                if (isRunningStandalone()) {
-                    document.getElementById('mobile-install-btn').innerHTML = '<i class="fas fa-check"></i> App Installed';
-                    document.getElementById('mobile-install-btn').disabled = true;
-                    document.getElementById('mobile-install-btn').style.opacity = '0.7';
-                }
             });
             
+            // Track when app is installed
             window.addEventListener('appinstalled', (evt) => {
+                console.log('App was installed successfully');
                 deferredPrompt = null;
+                
+                // Update UI to show app is installed
+                updateInstallUI(true);
+                
+                // Hide all install prompts
+                hideInstallPrompt();
                 document.getElementById('install-button').style.display = 'none';
-                document.getElementById('mobile-install-btn').innerHTML = '<i class="fas fa-check"></i> App Installed';
-                document.getElementById('mobile-install-btn').disabled = true;
-                document.getElementById('mobile-install-btn').style.opacity = '0.7';
             });
         }
         
         // Check if app is running in standalone mode
         function checkStandaloneMode() {
             if (isRunningStandalone()) {
-                document.body.classList.add('standalone-mode');
-                document.getElementById('mobile-install-btn').innerHTML = '<i class="fas fa-check"></i> App Installed';
-                document.getElementById('mobile-install-btn').disabled = true;
-                document.getElementById('mobile-install-btn').style.opacity = '0.7';
+                console.log('App is running in standalone mode');
+                updateInstallUI(true);
             }
         }
         
@@ -1809,27 +1769,76 @@
                    window.navigator.standalone === true;
         }
         
-        // Show update notification
-        function showUpdateNotification() {
-            if (confirm('A new version of the app is available. Reload to update?')) {
-                navigator.serviceWorker.getRegistration().then(registration => {
-                    if (registration && registration.waiting) {
-                        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-                        window.location.reload();
-                    }
-                });
+        // Update install UI based on installation status
+        function updateInstallUI(isInstalled) {
+            const mobileInstallBtn = document.getElementById('mobile-install-btn');
+            const alreadyInstalledMessage = document.getElementById('already-installed-message');
+            
+            if (isInstalled) {
+                mobileInstallBtn.innerHTML = '<i class="fas fa-check"></i> App Installed';
+                mobileInstallBtn.disabled = true;
+                mobileInstallBtn.style.opacity = '0.7';
+                mobileInstallBtn.style.cursor = 'default';
+                alreadyInstalledMessage.style.display = 'block';
+                hideInstallPrompt();
+            } else {
+                mobileInstallBtn.innerHTML = '<i class="fas fa-download"></i> Install App';
+                mobileInstallBtn.disabled = false;
+                mobileInstallBtn.style.opacity = '1';
+                mobileInstallBtn.style.cursor = 'pointer';
+                alreadyInstalledMessage.style.display = 'none';
             }
+        }
+        
+        // Show install prompt if eligible
+        function showInstallPromptIfEligible() {
+            // Don't show if already installed, prompt already shown, or no deferred prompt
+            if (isRunningStandalone() || installPromptShown || !deferredPrompt) {
+                return;
+            }
+            
+            // Check if user is on a mobile device
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                installPrompt.classList.remove('hidden');
+                installPromptShown = true;
+                
+                // Auto-hide after 15 seconds
+                setTimeout(() => {
+                    hideInstallPrompt();
+                }, 15000);
+            }
+        }
+        
+        // Hide install prompt
+        function hideInstallPrompt() {
+            installPrompt.classList.add('hidden');
         }
         
         // Install app function
         async function installApp() {
-            if (deferredPrompt) {
+            if (!deferredPrompt) {
+                alert('This app is already installed or cannot be installed on this device.');
+                return;
+            }
+            
+            try {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 
                 if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
                     deferredPrompt = null;
+                    updateInstallUI(true);
+                } else {
+                    console.log('User dismissed the install prompt');
+                    installPromptShown = true;
+                    hideInstallPrompt();
                 }
+            } catch (error) {
+                console.error('Installation failed:', error);
+                alert('Installation failed. Please try again or install manually from your browser menu.');
             }
         }
         
@@ -1838,9 +1847,20 @@
             // Start button event
             startButton.addEventListener('click', startApp);
             
-            // Also allow tapping/clicking on the entire start screen to start
-            startScreen.addEventListener('click', function(e) {
-                if (e.target === startScreen) {
+            // Optional: Also allow clicking on the screen to start
+            const startScreen = document.getElementById('startScreen');
+            if (startScreen) {
+                startScreen.addEventListener('click', function(e) {
+                    if (e.target === startScreen) {
+                        startApp();
+                    }
+                });
+            }
+            
+            // Optional: Also handle keyboard (Enter key) to start
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && document.getElementById('startScreen') && 
+                    !document.getElementById('startScreen').classList.contains('hidden')) {
                     startApp();
                 }
             });
@@ -1875,25 +1895,32 @@
             
             document.getElementById('new-calculation-btn').addEventListener('click', function() {
                 observedData = [];
+                rowTotals = [];
+                columnTotals = [];
+                grandTotal = 0;
                 goToStep(1);
             });
             
             document.getElementById('clear-table-btn').addEventListener('click', function() {
-                document.querySelectorAll('.data-input').forEach(input => {
-                    input.value = '0';
-                });
-                updateTotals();
+                if (currentStep === 2) {
+                    document.querySelectorAll('.data-input').forEach(input => {
+                        input.value = '0';
+                    });
+                    updateTotals();
+                }
             });
             
             document.getElementById('auto-fill-btn').addEventListener('click', function() {
-                for (let i = 0; i < groups; i++) {
-                    for (let j = 0; j < categories; j++) {
-                        const randomValue = Math.floor(Math.random() * 50) + 1;
-                        const input = document.getElementById(`cell-${i}-${j}`);
-                        if (input) input.value = randomValue;
+                if (currentStep === 2) {
+                    for (let i = 0; i < groups; i++) {
+                        for (let j = 0; j < categories; j++) {
+                            const randomValue = Math.floor(Math.random() * 50) + 1;
+                            const input = document.getElementById(`cell-${i}-${j}`);
+                            if (input) input.value = randomValue;
+                        }
                     }
+                    updateTotals();
                 }
-                updateTotals();
             });
             
             document.getElementById('significance-level').addEventListener('change', function() {
@@ -1902,12 +1929,48 @@
                 }
             });
             
-            // Download results button
-            document.getElementById('download-results-btn').addEventListener('click', downloadResultsAsWord);
+            // Download results button (simplified version)
+            document.getElementById('download-results-btn').addEventListener('click', function() {
+                if (grandTotal === 0) {
+                    alert("Please enter data and calculate results first!");
+                    return;
+                }
+                
+                const chiSquare = document.getElementById('chi-square-value').textContent;
+                const df = document.getElementById('degrees-of-freedom').textContent;
+                const criticalValue = document.getElementById('critical-value').textContent;
+                const resultText = document.getElementById('result-text').textContent;
+                
+                // Create simple text content for download
+                const content = `Chi-Square Test Results\n\n` +
+                               `Chi-Square Value: ${chiSquare}\n` +
+                               `Degrees of Freedom: ${df}\n` +
+                               `Critical Value: ${criticalValue}\n` +
+                               `Result: ${resultText}\n\n` +
+                               `Generated on: ${new Date().toLocaleString()}`;
+                
+                const blob = new Blob([content], { type: 'text/plain' });
+                const link = document.createElement('a');
+                const fileName = `ChiSquare_Results_${new Date().getTime()}.txt`;
+                
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName;
+                link.click();
+                
+                URL.revokeObjectURL(link.href);
+            });
             
             // Install buttons
             document.getElementById('install-button').addEventListener('click', installApp);
             document.getElementById('mobile-install-btn').addEventListener('click', installApp);
+            
+            // Install prompt buttons
+            if (installPromptButton) {
+                installPromptButton.addEventListener('click', installApp);
+            }
+            if (closeInstallPrompt) {
+                closeInstallPrompt.addEventListener('click', hideInstallPrompt);
+            }
             
             // Step indicator click events
             document.getElementById('step1-indicator').addEventListener('click', function() {
@@ -1921,11 +1984,6 @@
             document.getElementById('step3-indicator').addEventListener('click', function() {
                 if (currentStep > 2) goToStep(3);
             });
-            
-            // Prevent pull-to-refresh in standalone mode
-            if (isRunningStandalone()) {
-                document.body.style.overscrollBehavior = 'none';
-            }
         }
     </script>
 </body>
