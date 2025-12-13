@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <title>Chi-Square Test Calculator with Critical Values</title>
     
     <!-- PWA Configuration -->
@@ -10,7 +10,7 @@
     <meta name="theme-color" content="#6a2fb2">
     
     <!-- iOS Support -->
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ChiSquare App">
@@ -416,6 +416,61 @@
             display: none;
         }
         
+        /* FIXED: Group and Category Name Inputs */
+        .input-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #e9ecef;
+        }
+        
+        .input-hint {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 15px;
+            font-style: italic;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #dee2e6;
+        }
+        
+        #group-names-container, #category-names-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            margin-top: 10px;
+        }
+        
+        .input-group-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .input-group-wrapper > div {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+        }
+        
+        .input-group-wrapper label {
+            min-width: 100px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0;
+        }
+        
+        .input-group-wrapper input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
         /* Mobile Optimizations */
         @media (max-width: 768px) {
             body {
@@ -485,6 +540,23 @@
                 right: 10px;
                 padding: 10px 16px;
                 font-size: 14px;
+            }
+            
+            /* Mobile fixes for input containers */
+            #group-names-container, #category-names-container {
+                max-height: 300px;
+                padding: 10px;
+            }
+            
+            .input-group-wrapper > div {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .input-group-wrapper label {
+                min-width: auto;
+                width: 100%;
             }
         }
         
@@ -561,12 +633,14 @@
                     </div>
                     
                     <h3>Group Names (Rows)</h3>
-                    <div id="group-names-container">
+                    <div id="group-names-container" class="input-container">
+                        <div class="input-hint">Enter names for your groups (e.g., Male, Female, LGBTQ+)</div>
                         <!-- Group names will be generated here -->
                     </div>
                     
                     <h3>Category Names (Columns)</h3>
-                    <div id="category-names-container">
+                    <div id="category-names-container" class="input-container">
+                        <div class="input-hint">Enter names for your categories (e.g., 80-85, 86-90, 91-95, 96-100)</div>
                         <!-- Category names will be generated here -->
                     </div>
                     
@@ -814,6 +888,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             initializeGroupNames();
             initializeCategoryNames();
+            updateGroupAndCategoryNames(); // FIXED: Added this line
             updateTableSizeControls();
             populateCriticalValueTable();
             setupEventListeners();
@@ -821,46 +896,120 @@
             checkStandaloneMode();
         });
         
-        // Initialize group names inputs
+        // Initialize group names inputs - FIXED VERSION
         function initializeGroupNames() {
             const container = document.getElementById('group-names-container');
+            // Clear only the input area, keep the hint
+            const hint = container.querySelector('.input-hint');
             container.innerHTML = '';
+            if (hint) {
+                container.appendChild(hint);
+            } else {
+                // Add hint if not present
+                const newHint = document.createElement('div');
+                newHint.className = 'input-hint';
+                newHint.textContent = 'Enter names for your groups (e.g., Male, Female, LGBTQ+)';
+                container.appendChild(newHint);
+            }
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'input-group-wrapper';
             
             for (let i = 0; i < 5; i++) {
+                const div = document.createElement('div');
+                div.style.display = 'flex';
+                div.style.alignItems = 'center';
+                div.style.gap = '10px';
+                div.style.padding = '8px 0';
+                
+                const label = document.createElement('label');
+                label.textContent = `Group ${i+1}:`;
+                label.style.minWidth = '80px';
+                label.style.fontWeight = '600';
+                label.style.color = '#333';
+                label.style.marginBottom = '0';
+                
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.id = `group-${i}`;
-                input.placeholder = `Group ${i+1}`;
-                input.value = i < groupNames.length ? groupNames[i] : '';
+                input.placeholder = `Enter name for Group ${i+1}`;
+                input.value = i < groupNames.length ? groupNames[i] : `Group ${i+1}`;
+                input.style.flex = '1';
+                input.style.padding = '12px 15px';
+                input.style.border = '1px solid #ddd';
+                input.style.borderRadius = '6px';
+                input.style.fontSize = '1rem';
                 input.classList.add('group-name-input');
                 
+                div.appendChild(label);
+                div.appendChild(input);
+                
                 if (i >= groups) {
-                    input.style.display = 'none';
+                    div.style.display = 'none';
                 }
                 
-                container.appendChild(input);
+                wrapper.appendChild(div);
             }
+            
+            container.appendChild(wrapper);
         }
         
-        // Initialize category names inputs
+        // Initialize category names inputs - FIXED VERSION
         function initializeCategoryNames() {
             const container = document.getElementById('category-names-container');
+            // Clear only the input area, keep the hint
+            const hint = container.querySelector('.input-hint');
             container.innerHTML = '';
+            if (hint) {
+                container.appendChild(hint);
+            } else {
+                // Add hint if not present
+                const newHint = document.createElement('div');
+                newHint.className = 'input-hint';
+                newHint.textContent = 'Enter names for your categories (e.g., 80-85, 86-90, 91-95, 96-100)';
+                container.appendChild(newHint);
+            }
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'input-group-wrapper';
             
             for (let i = 0; i < 5; i++) {
+                const div = document.createElement('div');
+                div.style.display = 'flex';
+                div.style.alignItems = 'center';
+                div.style.gap = '10px';
+                div.style.padding = '8px 0';
+                
+                const label = document.createElement('label');
+                label.textContent = `Category ${i+1}:`;
+                label.style.minWidth = '80px';
+                label.style.fontWeight = '600';
+                label.style.color = '#333';
+                label.style.marginBottom = '0';
+                
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.id = `category-${i}`;
-                input.placeholder = `Category ${i+1}`;
-                input.value = i < categoryNames.length ? categoryNames[i] : '';
+                input.placeholder = `Enter name for Category ${i+1}`;
+                input.value = i < categoryNames.length ? categoryNames[i] : `Category ${i+1}`;
+                input.style.flex = '1';
+                input.style.padding = '12px 15px';
+                input.style.border = '1px solid #ddd';
+                input.style.borderRadius = '6px';
+                input.style.fontSize = '1rem';
                 input.classList.add('category-name-input');
                 
+                div.appendChild(label);
+                div.appendChild(input);
+                
                 if (i >= categories) {
-                    input.style.display = 'none';
+                    div.style.display = 'none';
                 }
                 
-                container.appendChild(input);
+                wrapper.appendChild(div);
             }
+            
+            container.appendChild(wrapper);
         }
         
         // Update table size based on user selection
@@ -872,13 +1021,13 @@
             categories = parseInt(numCategoriesSelect.value);
             
             // Show/hide group name inputs
-            document.querySelectorAll('.group-name-input').forEach((input, index) => {
-                input.style.display = index < groups ? 'block' : 'none';
+            document.querySelectorAll('#group-names-container .input-group-wrapper > div').forEach((div, index) => {
+                div.style.display = index < groups ? 'flex' : 'none';
             });
             
             // Show/hide category name inputs
-            document.querySelectorAll('.category-name-input').forEach((input, index) => {
-                input.style.display = index < categories ? 'block' : 'none';
+            document.querySelectorAll('#category-names-container .input-group-wrapper > div').forEach((div, index) => {
+                div.style.display = index < categories ? 'flex' : 'none';
             });
         }
         
@@ -1018,12 +1167,12 @@
             
             for (let i = 0; i < groups; i++) {
                 const input = document.getElementById(`group-${i}`);
-                groupNames.push(input.value || `Group ${i+1}`);
+                groupNames.push(input ? input.value || `Group ${i+1}` : `Group ${i+1}`);
             }
             
             for (let j = 0; j < categories; j++) {
                 const input = document.getElementById(`category-${j}`);
-                categoryNames.push(input.value || `Category ${j+1}`);
+                categoryNames.push(input ? input.value || `Category ${j+1}` : `Category ${j+1}`);
             }
         }
         
