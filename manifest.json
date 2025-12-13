@@ -1,16 +1,59 @@
 {
   "name": "Chi-Square Test Calculator",
   "short_name": "ChiSquare",
-  "description": "Statistical analysis tool for chi-square test of independence",
+  "description": "Mobile-friendly statistical analysis tool for chi-square test of independence with offline capabilities",
   "start_url": "/CHI-Square-Calculator/",
+  "scope": "/CHI-Square-Calculator/",
+  
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  
   "background_color": "#f5f7fa",
   "theme_color": "#6a2fb2",
+  
   "orientation": "any",
+  "categories": ["education", "productivity", "utilities"],
+  
   "icons": [
+    {
+      "src": "icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
     {
       "src": "icon-192.png",
       "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-384.png",
+      "sizes": "384x384",
       "type": "image/png",
       "purpose": "any maskable"
     },
@@ -21,11 +64,11 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["education", "productivity", "utilities"],
-  "scope": "/CHI-Square-Calculator/",
-  "id": "/CHI-Square-Calculator/",
+  
   "dir": "ltr",
   "lang": "en-US",
-  "display_override": ["standalone", "minimal-ui"],
-  "prefer_related_applications": false
+  "id": "/CHI-Square-Calculator/",
+  
+  "prefer_related_applications": false,
+  "related_applications": []
 }
