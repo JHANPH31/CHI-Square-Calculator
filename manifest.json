@@ -1,6 +1,6 @@
 {
   "name": "Chi-Square Test Calculator",
-  "short_name": "ChiSquare",
+  "short_name": "Chi Square Calculator",
   "description": "Mobile-friendly statistical analysis tool for chi-square test of independence with offline capabilities",
   "start_url": "/CHI-Square-Calculator/",
   "scope": "/CHI-Square-Calculator/",
@@ -42,3 +42,4 @@
   "prefer_related_applications": false,
   "related_applications": []
 }
+
