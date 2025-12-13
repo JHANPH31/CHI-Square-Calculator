@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Chi-Square Test Calculator with Critical Values</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6a2fb2">
+    
+    <!-- iOS Support -->
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ChiSquare App">
+    
+    <!-- Android Support -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="ChiSquare App">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            padding-left: max(20px, env(safe-area-inset-left));
+            padding-right: max(20px, env(safe-area-inset-right));
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 20px;
+            align-items: flex-start;
+        }
+        
+        :root{
+            --primary-1: #6a2fb2; /* deep purple */
+            --primary-2: #8b3fb6; /* medium purple */
+            --accent: #ffc107; /* golden yellow */
+            --accent-light: #ffe082; /* light yellow */
+            --muted: #f5f3fb;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-2) 0%, var(--primary-1) 100%);
+            color: white;
+            padding: 30px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(106,47,178,0.15);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        h1 i {
+            font-size: 2.2rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+        }
+        
+        .main-content {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .sidebar {
+            flex: 0 0 360px;
+            background-color: rgb(145, 21, 199);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card {
+            background-color: rgb(255, 255, 255);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        h2 {
+            color: var(--primary-1);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        h3 {
+            color: var(--primary-1);
+            margin: 15px 0 10px;
+        }
+        
+        .step-indicator {
+            display: flex;
+            margin-bottom: 30px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 5px;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 15px 10px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .step.active {
+            background-color: var(--primary-1);
+            color: white;
+        }
+        
+        .step.completed {
+            background-color: var(--accent-light);
+            color: var(--primary-1);
+        }
+        
+        .input-section {
+            display: none;
+        }
+        
+        .input-section.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #182848;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 16px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.3s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-1);
+            box-shadow: 0 0 0 3px rgba(155,89,182,0.12);
+        }
+        
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 50px;
+            min-width: 44px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-1);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-2);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(106,47,178,0.12);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background-color: #138496;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #182848;
+        }
+        
+        td input {
+            width: 100%;
+            padding: 12px 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .results {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+            align-items: center;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-value {
+            font-weight: 700;
+            color: #182848;
+        }
+        
+        .significance {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .significant {
+            background-color: rgba(255,193,7,0.15);
+            color: var(--primary-1);
+        }
+        
+        .not-significant {
+            background-color: rgba(200,200,200,0.08);
+            color: #6c6c6c;
+        }
+        
+        .interpretation {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f0fe;
+            border-left: 4px solid #4b6cb7;
+            border-radius: 4px;
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .example {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #4b6cb7;
+        }
+        
+        .instructions {
+            font-size: 0.95rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .critical-value-table-container {
+            overflow-x: auto;
+            margin-top: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .critical-value-table {
+            font-size: 0.85rem;
+        }
+        
+        .critical-value-table th {
+            background-color: #e9ecef;
+            position: sticky;
+            top: 0;
+        }
+        
+        .critical-value-table td.highlight {
+            background-color: #fff3cd;
+            font-weight: bold;
+        }
+        
+        .comparison {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        #install-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #6a2fb2 0%, #8b3fb6 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(106,47,178,0.3);
+            cursor: pointer;
+            display: none;
+        }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                font-size: 16px;
+            }
+            
+            .container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .sidebar {
+                flex: 1;
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .step-indicator {
+                flex-direction: column;
+            }
+            
+            .step {
+                margin-bottom: 5px;
+                padding: 12px 8px;
+            }
+            
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 5px;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            th, td {
+                padding: 8px 5px;
+                min-width: 60px;
+            }
+            
+            .result-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            #install-button {
+                bottom: 10px;
+                right: 10px;
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                flex: 1;
+            }
+        }
+        
+        /* Standalone mode adjustments */
+        @media (display-mode: standalone) {
+            body {
+                overscroll-behavior: none;
+            }
+            
+            header {
+                padding-top: calc(30px + env(safe-area-inset-top, 20px));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="display:flex;align-items:center;justify-content:center;gap:18px;">
+            <div style="width:84px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:linear-gradient(135deg,var(--primary-2),var(--primary-1));box-shadow:0 6px 14px rgba(106,47,178,0.12);">
+                <span style="color:white;font-weight:800;font-size:1.6rem;">X<span style="font-size:0.9rem;vertical-align:top">2</span></span>
+            </div>
+            <div>
+                <h1 style="margin:0;font-size:2rem;color:white;display:flex;align-items:center;justify-content:center;gap:12px;">
+                    <span style="font-weight:700;letter-spacing:1px;">CHI</span>
+                    <span style="background:var(--accent);color:var(--primary-1);padding:6px 12px;border-radius:6px;font-weight:800;">SQUARE</span>
+                </h1>
+                <p class="subtitle" style="margin:6px 0 0;font-size:0.95rem;opacity:0.95;color:rgba(255,255,255,0.9)">TEST OF INDEPENDENCE CALCULATOR</p>
+                <p style="margin:2px 0 0;font-size:0.85rem;color:rgba(255,255,255,0.8);font-style:italic;">Mobile App Version</p>
+            </div>
+        </div>
+    </header>
+    
+    <div class="step-indicator">
+        <div class="step active" id="step1-indicator">1. Setup Table</div>
+        <div class="step" id="step2-indicator">2. Enter Data</div>
+        <div class="step" id="step3-indicator">3. View Results</div>
+    </div>
+    
+    <div class="container">
+        <div class="main-content">
+            <div class="card">
+                <div class="input-section active" id="step1">
+                    <h2><i class="fas fa-table"></i> Step 1: Define Groups and Categories</h2>
+                    <p class="instructions">Enter names for your groups (rows) and categories (columns). You can use up to 5 groups and 5 categories.<br><em>Example: Groups could be Genders like: "Male, Female, Lgbtq++". Categories could be Grades "80-85", "86-90", "91-95", "96-100".</em></p>
+                    
+                    <div class="form-group">
+                        <label for="num-groups">Number of Groups (Rows)</label>
+                        <select id="num-groups">
+                            <option value="2">2</option>
+                            <option value="3" selected>3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="num-categories">Number of Categories (Columns)</label>
+                        <select id="num-categories">
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4" selected>4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    
+                    <h3>Group Names (Rows)</h3>
+                    <div id="group-names-container">
+                        <!-- Group names will be generated here -->
+                    </div>
+                    
+                    <h3>Category Names (Columns)</h3>
+                    <div id="category-names-container">
+                        <!-- Category names will be generated here -->
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="next-step1">
+                            Next: Enter Data <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    
+                    <h3>Critical Value Table</h3>
+                    <p class="instructions">Find the critical value for your degrees of freedom (df) and selected significance level (α).</p>
+                    
+                    <div class="critical-value-table-container">
+                        <table class="critical-value-table">
+                            <thead>
+                                <tr>
+                                    <th>df</th>
+                                    <th>0.10</th>
+                                    <th>0.05</th>
+                                    <th>0.025</th>
+                                    <th>0.01</th>
+                                </tr>
+                            </thead>
+                            <tbody id="critical-value-table-body">
+                                <!-- Critical values will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="input-section" id="step2">
+                    <h2><i class="fas fa-edit"></i> Step 2: Enter Observed Frequencies</h2>
+                    <p class="instructions">Enter the observed frequencies (counts) for each combination of group and category in the table below.</p>
+                    
+                    <div class="table-controls">
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" id="clear-table-btn">
+                                <i class="fas fa-eraser"></i> Clear Table
+                            </button>
+                            <button class="btn btn-secondary" id="auto-fill-btn">
+                                <i class="fas fa-magic"></i> Auto-Fill
+                            </button>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" id="back-step2">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                            <button class="btn btn-primary" id="next-step2">
+                                Next: Calculate <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="data-table-container">
+                        <!-- Data table will be generated here -->
+                    </div>
+                </div>
+                
+                <div class="input-section" id="step3">
+                    <h2><i class="fas fa-chart-bar"></i> Step 3: Chi-Square Test Results</h2>
+                    <p class="instructions">The chi-square test results are displayed below. Compare the computed chi-square statistic to the critical value to determine if there is a significant relationship between the variables.</p>
+                    
+                    <div class="results">
+                        <div class="result-item">
+                            <span>1. HO (ACCEPTED OR REJECTED)</span>
+                            <span class="result-value">
+                                <span id="result-text">Not calculated yet</span>
+                                <span class="significance hidden" id="significance-indicator"></span>
+                            </span>
+                        </div>
+                        <div class="result-item">
+                            <span>2. DF:</span>
+                            <span class="result-value" id="degrees-of-freedom">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span>3. SIGNIFICANCE LEVEL</span>
+                            <span class="result-value">
+                                <select id="significance-level">
+                                    <option value="0.10">0.10</option>
+                                    <option value="0.05" selected>0.05</option>
+                                    <option value="0.025">0.025</option>
+                                    <option value="0.01">0.01</option>
+                                </select>
+                            </span>
+                        </div>
+                        <div class="result-item">
+                            <span>4. CRITICAL VALUE:</span>
+                            <span class="result-value" id="critical-value">0.00</span>
+                        </div>
+                        <div class="result-item">
+                            <span>5. COMPUTED VALUE:</span>
+                            <span class="result-value" id="chi-square-value">0.00</span>
+                        </div>
+                        <div class="result-item">
+                            <span>6. DECISION:</span>
+                            <span class="result-value">
+                                <span id="comparison-text">Not calculated yet</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison">
+                        <h3><i class="fas fa-balance-scale"></i> Computed vs. Critical Value</h3>
+                        <p id="comparison-details">After you calculate the chi-square test, the comparison between computed and critical values will appear here.</p>
+                    </div>
+                    
+                    <div class="interpretation">
+                        <h3><i class="fas fa-lightbulb"></i> Interpretation</h3>
+                        <p id="interpretation-text">After you calculate the chi-square test, the interpretation will appear here. It will explain whether there's a statistically significant relationship between your groups and categories.</p>
+                    </div>
+                    
+                    <h3>Observed Frequencies</h3>
+                    <div id="observed-table-display"></div>
+                    
+                    <h3>Chi-Square Calculation Details</h3>
+                    <div id="breakdown-table-container"></div>
+                    
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" id="back-step3">
+                            <i class="fas fa-arrow-left"></i> Back to Data Entry
+                        </button>
+                        <button class="btn btn-info" id="download-results-btn">
+                            <i class="fas fa-download"></i> Download Results
+                        </button>
+                        <button class="btn btn-success" id="new-calculation-btn">
+                            <i class="fas fa-redo"></i> New Calculation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sidebar">
+            <div class="card">
+                <h2><i class="fas fa-info-circle"></i> About Chi-Square Test</h2>
+                <p>The chi-square test determines if there's a significant association between two categorical variables by comparing computed χ² to critical values.</p>
+                
+                <h3>Decision Rule</h3>
+                <p>Compare your computed χ² value to the critical value from the table:</p>
+                <ul>
+                    <li>If χ² ≥ Critical Value: Reject null hypothesis (significant relationship)</li>
+                    <li>If χ² < Critical Value: Fail to reject null hypothesis (no significant relationship)</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-calculator"></i> EXPECTED FREQUENCY TABLE</h2>
+                <p class="instructions">Expected frequencies are calculated as (row total × column total) ÷ grand total.</p>
+                <div id="expected-table-container" style="border: 1px solid #e9ecef; border-radius: 6px; padding: 8px;">
+                    <!-- Expected frequencies table will appear here -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-mobile-alt"></i> Mobile App Features</h2>
+                <p>This app can be installed on your device:</p>
+                <ul>
+                    <li>Works offline</li>
+                    <li>Launch from home screen</li>
+                    <li>Full screen experience</li>
+                    <li>No internet needed after install</li>
+                </ul>
+                <button class="btn btn-primary" id="mobile-install-btn" style="width: 100%; margin-top: 10px;">
+                    <i class="fas fa-download"></i> Install App
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Chi-Square Test Calculator Mobile App</p>
+        <p>Works offline • Installable • No app store required</p>
+    </footer>
+    
+    <!-- Install Button (floating) -->
+    <button id="install-button" style="display: none;">📱 Install App</button>
+    
+    <script>
+        // State variables
+        let currentStep = 1;
+        let groups = 3;
+        let categories = 4;
+        let groupNames = [];
+        let categoryNames = [];
+        let observedData = [];
+        let expectedData = [];
+        let rowTotals = [];
+        let columnTotals = [];
+        let grandTotal = 0;
+        let deferredPrompt = null;
+        
+        // Chi-Square Critical Values Table (from the image)
+        const chiSquareTable = {
+            // Format: df: {alpha: criticalValue}
+            1: {0.10: 2.706, 0.05: 3.841, 0.025: 5.024, 0.01: 6.635},
+            2: {0.10: 4.605, 0.05: 5.991, 0.025: 7.378, 0.01: 9.210},
+            3: {0.10: 6.251, 0.05: 7.815, 0.025: 9.348, 0.01: 11.345},
+            4: {0.10: 7.779, 0.05: 9.488, 0.025: 11.143, 0.01: 13.277},
+            5: {0.10: 9.236, 0.05: 11.070, 0.025: 12.833, 0.01: 15.086},
+            6: {0.10: 10.645, 0.05: 12.592, 0.025: 14.449, 0.01: 16.812},
+            7: {0.10: 12.017, 0.05: 14.067, 0.025: 16.013, 0.01: 18.475},
+            8: {0.10: 13.362, 0.05: 15.507, 0.025: 17.535, 0.01: 20.090},
+            9: {0.10: 14.684, 0.05: 16.919, 0.025: 19.023, 0.01: 21.666},
+            10: {0.10: 15.987, 0.05: 18.307, 0.025: 20.483, 0.01: 23.209},
+            11: {0.10: 17.275, 0.05: 19.675, 0.025: 21.920, 0.01: 24.725},
+            12: {0.10: 18.549, 0.05: 21.026, 0.025: 23.337, 0.01: 26.217},
+            13: {0.10: 19.812, 0.05: 22.362, 0.025: 24.736, 0.01: 27.688},
+            14: {0.10: 21.064, 0.05: 23.685, 0.025: 26.119, 0.01: 29.141},
+            15: {0.10: 22.307, 0.05: 24.996, 0.025: 27.488, 0.01: 30.578},
+            16: {0.10: 23.542, 0.05: 26.296, 0.025: 28.845, 0.01: 32.000},
+            17: {0.10: 24.769, 0.05: 27.587, 0.025: 30.191, 0.01: 33.409},
+            18: {0.10: 25.989, 0.05: 28.869, 0.025: 31.526, 0.01: 34.805},
+            19: {0.10: 27.204, 0.05: 30.144, 0.025: 32.852, 0.01: 36.191},
+            20: {0.10: 28.412, 0.05: 31.410, 0.025: 34.170, 0.01: 37.566},
+            21: {0.10: 29.615, 0.05: 32.671, 0.025: 35.479, 0.01: 38.932},
+            22: {0.10: 30.813, 0.05: 33.924, 0.025: 36.781, 0.01: 40.289},
+            23: {0.10: 32.007, 0.05: 35.172, 0.025: 38.076, 0.01: 41.638},
+            24: {0.10: 33.196, 0.05: 36.415, 0.025: 39.364, 0.01: 42.980},
+            25: {0.10: 34.382, 0.05: 37.652, 0.025: 40.646, 0.01: 44.314},
+            26: {0.10: 35.563, 0.05: 38.885, 0.025: 41.923, 0.01: 45.642},
+            27: {0.10: 36.741, 0.05: 40.113, 0.025: 43.195, 0.01: 46.963},
+            28: {0.10: 37.916, 0.05: 41.337, 0.025: 44.461, 0.01: 48.278},
+            29: {0.10: 39.087, 0.05: 42.557, 0.025: 45.722, 0.01: 49.588},
+            30: {0.10: 40.256, 0.05: 43.773, 0.025: 46.979, 0.01: 50.892},
+            40: {0.10: 51.805, 0.05: 55.758, 0.025: 59.342, 0.01: 63.691},
+            50: {0.10: 63.167, 0.05: 67.505, 0.025: 71.420, 0.01: 76.154},
+            60: {0.10: 74.397, 0.05: 79.082, 0.025: 83.298, 0.01: 88.379},
+            70: {0.10: 85.527, 0.05: 90.531, 0.025: 95.023, 0.01: 100.425},
+            80: {0.10: 96.578, 0.05: 101.879, 0.025: 106.629, 0.01: 112.329},
+            100: {0.10: 107.565, 0.05: 113.145, 0.025: 118.136, 0.01: 124.116},
+            1000: {0.10: 118.498, 0.05: 124.342, 0.025: 129.561, 0.01: 135.807}
+        };
+        
+        // DOM Elements
+        const step1Section = document.getElementById('step1');
+        const step2Section = document.getElementById('step2');
+        const step3Section = document.getElementById('step3');
+        const step1Indicator = document.getElementById('step1-indicator');
+        const step2Indicator = document.getElementById('step2-indicator');
+        const step3Indicator = document.getElementById('step3-indicator');
+        const installButton = document.getElementById('install-button');
+        const mobileInstallBtn = document.getElementById('mobile-install-btn');
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeGroupNames();
+            initializeCategoryNames();
+            updateTableSizeControls();
+            populateCriticalValueTable();
+            setupEventListeners();
+            setupPWA();
+            checkStandaloneMode();
+        });
+        
+        // Initialize group names inputs
+        function initializeGroupNames() {
+            const container = document.getElementById('group-names-container');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < 5; i++) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = `group-${i}`;
+                input.placeholder = `Group ${i+1}`;
+                input.value = i < groupNames.length ? groupNames[i] : '';
+                input.classList.add('group-name-input');
+                
+                if (i >= groups) {
+                    input.style.display = 'none';
+                }
+                
+                container.appendChild(input);
+            }
+        }
+        
+        // Initialize category names inputs
+        function initializeCategoryNames() {
+            const container = document.getElementById('category-names-container');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < 5; i++) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = `category-${i}`;
+                input.placeholder = `Category ${i+1}`;
+                input.value = i < categoryNames.length ? categoryNames[i] : '';
+                input.classList.add('category-name-input');
+                
+                if (i >= categories) {
+                    input.style.display = 'none';
+                }
+                
+                container.appendChild(input);
+            }
+        }
+        
+        // Update table size based on user selection
+        function updateTableSizeControls() {
+            const numGroupsSelect = document.getElementById('num-groups');
+            const numCategoriesSelect = document.getElementById('num-categories');
+            
+            groups = parseInt(numGroupsSelect.value);
+            categories = parseInt(numCategoriesSelect.value);
+            
+            // Show/hide group name inputs
+            document.querySelectorAll('.group-name-input').forEach((input, index) => {
+                input.style.display = index < groups ? 'block' : 'none';
+            });
+            
+            // Show/hide category name inputs
+            document.querySelectorAll('.category-name-input').forEach((input, index) => {
+                input.style.display = index < categories ? 'block' : 'none';
+            });
+        }
+        
+        // Populate the critical value table
+        function populateCriticalValueTable() {
+            const tableBody = document.getElementById('critical-value-table-body');
+            tableBody.innerHTML = '';
+            
+            // Define the degrees of freedom to show
+            const dfsToShow = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30, 40, 50];
+            
+            // Create rows for each degree of freedom
+            dfsToShow.forEach(df => {
+                const row = document.createElement('tr');
+                
+                // DF cell
+                const dfCell = document.createElement('td');
+                dfCell.textContent = df;
+                dfCell.style.fontWeight = 'bold';
+                row.appendChild(dfCell);
+                
+                // Critical value cells for each alpha level
+                const alphas = [0.10, 0.05, 0.025, 0.01];
+                
+                alphas.forEach(alpha => {
+                    const valueCell = document.createElement('td');
+                    valueCell.className = `cv-${alpha}`;
+                    
+                    if (chiSquareTable[df] && chiSquareTable[df][alpha]) {
+                        valueCell.textContent = chiSquareTable[df][alpha].toFixed(3);
+                    } else {
+                        valueCell.textContent = '--';
+                    }
+                    
+                    row.appendChild(valueCell);
+                });
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Highlight the current critical value in the table
+        function highlightCriticalValue(df, alpha) {
+            // Remove previous highlights
+            document.querySelectorAll('.critical-value-table td').forEach(cell => {
+                cell.classList.remove('highlight');
+            });
+            
+            // Find and highlight the current critical value
+            const rows = document.querySelectorAll('#critical-value-table-body tr');
+            
+            rows.forEach(row => {
+                const dfCell = row.querySelector('td:first-child');
+                if (dfCell && parseInt(dfCell.textContent) === df) {
+                    // Determine which alpha column to highlight
+                    let alphaIndex;
+                    if (alpha === 0.10) alphaIndex = 1;
+                    else if (alpha === 0.05) alphaIndex = 2;
+                    else if (alpha === 0.025) alphaIndex = 3;
+                    else if (alpha === 0.01) alphaIndex = 4;
+                    
+                    if (alphaIndex) {
+                        const targetCell = row.querySelector(`td:nth-child(${alphaIndex + 1})`);
+                        if (targetCell) {
+                            targetCell.classList.add('highlight');
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Create the data entry table
+        function createDataTable() {
+            // Get current group and category names
+            updateGroupAndCategoryNames();
+            
+            const container = document.getElementById('data-table-container');
+            container.innerHTML = '';
+            
+            // Create table element
+            const table = document.createElement('table');
+            table.id = 'data-table';
+            
+            // Create header row with category names
+            let headerRow = '<thead><tr><th></th>';
+            for (let j = 0; j < categories; j++) {
+                headerRow += `<th>${categoryNames[j] || `Category ${j+1}`}</th>`;
+            }
+            headerRow += '<th>Row Total</th></tr></thead>';
+            
+            // Create table body with data inputs
+            let tableBody = '<tbody>';
+            for (let i = 0; i < groups; i++) {
+                tableBody += `<tr><th>${groupNames[i] || `Group ${i+1}`}</th>`;
+                
+                for (let j = 0; j < categories; j++) {
+                    // Initialize observedData if needed
+                    if (!observedData[i]) observedData[i] = [];
+                    if (!observedData[i][j]) observedData[i][j] = 0;
+                    
+                    tableBody += `<td><input type="number" min="0" step="1" 
+                        id="cell-${i}-${j}" 
+                        value="${observedData[i][j]}" 
+                        class="data-input" 
+                        inputmode="numeric"></td>`;
+                }
+                
+                // Row total cell
+                tableBody += `<td id="row-total-${i}" class="row-total">0</td></tr>`;
+            }
+            
+            // Create footer row for column totals
+            tableBody += '<tr><th>Column Total</th>';
+            for (let j = 0; j < categories; j++) {
+                tableBody += `<td id="col-total-${j}" class="col-total">0</td>`;
+            }
+            tableBody += `<td id="grand-total" class="grand-total">0</td></tr>`;
+            tableBody += '</tbody>';
+            
+            table.innerHTML = headerRow + tableBody;
+            container.appendChild(table);
+            
+            // Add event listeners to data inputs
+            document.querySelectorAll('.data-input').forEach(input => {
+                input.addEventListener('input', updateTotals);
+                input.addEventListener('input', validateInput);
+            });
+            
+            // Calculate initial totals
+            updateTotals();
+        }
+        
+        // Update group and category names from inputs
+        function updateGroupAndCategoryNames() {
+            groupNames = [];
+            categoryNames = [];
+            
+            for (let i = 0; i < groups; i++) {
+                const input = document.getElementById(`group-${i}`);
+                groupNames.push(input.value || `Group ${i+1}`);
+            }
+            
+            for (let j = 0; j < categories; j++) {
+                const input = document.getElementById(`category-${j}`);
+                categoryNames.push(input.value || `Category ${j+1}`);
+            }
+        }
+        
+        // Update row, column, and grand totals
+        function updateTotals() {
+            // Reset totals
+            rowTotals = new Array(groups).fill(0);
+            columnTotals = new Array(categories).fill(0);
+            grandTotal = 0;
+            
+            // Update observedData from inputs and calculate totals
+            for (let i = 0; i < groups; i++) {
+                for (let j = 0; j < categories; j++) {
+                    const input = document.getElementById(`cell-${i}-${j}`);
+                    if (input) {
+                        const value = parseInt(input.value) || 0;
+                        observedData[i][j] = value;
+                        rowTotals[i] += value;
+                        columnTotals[j] += value;
+                        grandTotal += value;
+                    }
+                }
+            }
+            
+            // Update total displays
+            for (let i = 0; i < groups; i++) {
+                const rowTotalElement = document.getElementById(`row-total-${i}`);
+                if (rowTotalElement) rowTotalElement.textContent = rowTotals[i];
+            }
+            
+            for (let j = 0; j < categories; j++) {
+                const colTotalElement = document.getElementById(`col-total-${j}`);
+                if (colTotalElement) colTotalElement.textContent = columnTotals[j];
+            }
+            
+            const grandTotalElement = document.getElementById('grand-total');
+            if (grandTotalElement) grandTotalElement.textContent = grandTotal;
+        }
+        
+        // Validate input to ensure non-negative integers
+        function validateInput(event) {
+            const input = event.target;
+            let value = parseInt(input.value);
+            
+            if (isNaN(value) || value < 0) {
+                input.value = 0;
+            } else {
+                input.value = Math.floor(value); // Ensure integer
+            }
+        }
+        
+        // Calculate expected frequencies
+        function calculateExpectedFrequencies() {
+            expectedData = [];
+            
+            for (let i = 0; i < groups; i++) {
+                expectedData[i] = [];
+                for (let j = 0; j < categories; j++) {
+                    if (grandTotal > 0) {
+                        expectedData[i][j] = (rowTotals[i] * columnTotals[j]) / grandTotal;
+                    } else {
+                        expectedData[i][j] = 0;
+                    }
+                }
+            }
+        }
+        
+        // Calculate chi-square statistic
+        function calculateChiSquare() {
+            let chiSquare = 0;
+            
+            for (let i = 0; i < groups; i++) {
+                for (let j = 0; j < categories; j++) {
+                    const observed = observedData[i][j];
+                    const expected = expectedData[i][j];
+                    
+                    if (expected > 0) {
+                        chiSquare += Math.pow(observed - expected, 2) / expected;
+                    }
+                }
+            }
+            
+            return chiSquare;
+        }
+        
+        // Calculate degrees of freedom
+        function calculateDegreesOfFreedom() {
+            return (groups - 1) * (categories - 1);
+        }
+        
+        // Get critical value from table
+        function getCriticalValue(df, alpha) {
+            // If df is in our table, return the value
+            if (chiSquareTable[df] && chiSquareTable[df][alpha]) {
+                return chiSquareTable[df][alpha];
+            }
+            
+            // For dfs not in our table, we'll use interpolation or approximation
+            // This is a simplified approximation for educational purposes
+            const dfs = Object.keys(chiSquareTable).map(Number).sort((a, b) => a - b);
+            
+            // If df is smaller than the smallest in table
+            if (df < dfs[0]) {
+                return chiSquareTable[dfs[0]][alpha];
+            }
+            
+            // If df is larger than the largest in table
+            if (df > dfs[dfs.length - 1]) {
+                // Use the largest available df
+                return chiSquareTable[dfs[dfs.length - 1]][alpha];
+            }
+            
+            // Find the closest df in the table
+            let closestDF = dfs[0];
+            for (let i = 0; i < dfs.length; i++) {
+                if (Math.abs(dfs[i] - df) < Math.abs(closestDF - df)) {
+                    closestDF = dfs[i];
+                }
+            }
+            
+            return chiSquareTable[closestDF][alpha];
+        }
+        
+        // Display expected frequencies table
+        function displayExpectedFrequencies() {
+            const container = document.getElementById('expected-table-container');
+            container.innerHTML = '';
+            
+            if (grandTotal === 0) {
+                container.innerHTML = '<p>Enter observed data to calculate expected frequencies.</p>';
+                return;
+            }
+            
+            const table = document.createElement('table');
+            
+            // Create header row
+            let headerRow = '<thead><tr><th></th>';
+            for (let j = 0; j < categories; j++) {
+                headerRow += `<th>${categoryNames[j]}</th>`;
+            }
+            headerRow += '</tr></thead>';
+            
+            // Create table body
+            let tableBody = '<tbody>';
+            for (let i = 0; i < groups; i++) {
+                tableBody += `<tr><th>${groupNames[i]}</th>`;
+                
+                for (let j = 0; j < categories; j++) {
+                    const expected = expectedData[i][j];
+                    tableBody += `<td>${expected.toFixed(2)}</td>`;
+                }
+                
+                tableBody += '</tr>';
+            }
+            tableBody += '</tbody>';
+            
+            table.innerHTML = headerRow + tableBody;
+            container.appendChild(table);
+        }
+        
+        // Update results display
+        function updateResultsDisplay() {
+            // Ensure totals are up to date and calculate needed values
+            updateTotals();
+            calculateExpectedFrequencies();
+            const chiSquare = calculateChiSquare();
+            const df = calculateDegreesOfFreedom();
+            const alpha = parseFloat(document.getElementById('significance-level').value);
+            const criticalValue = getCriticalValue(df, alpha);
+            
+            // Update display
+            document.getElementById('chi-square-value').textContent = chiSquare.toFixed(4);
+            document.getElementById('degrees-of-freedom').textContent = df;
+            document.getElementById('critical-value').textContent = criticalValue.toFixed(4);
+            
+            // Determine significance by comparing computed χ² to critical value
+            const comparisonText = document.getElementById('comparison-text');
+            const comparisonDetails = document.getElementById('comparison-details');
+            const resultText = document.getElementById('result-text');
+            const significanceIndicator = document.getElementById('significance-indicator');
+            
+            if (grandTotal === 0) {
+                comparisonText.textContent = 'Enter data to calculate';
+                comparisonDetails.textContent = 'After you calculate the chi-square test, the comparison between computed and critical values will appear here.';
+                resultText.textContent = 'Not calculated yet';
+                significanceIndicator.classList.add('hidden');
+            } else {
+                // Compare computed χ² to critical value
+                const isSignificant = chiSquare >= criticalValue;
+                
+                if (isSignificant) {
+                    comparisonText.textContent = `χ² (${chiSquare.toFixed(4)}) ≥ Critical Value (${criticalValue.toFixed(4)})`;
+                    comparisonDetails.textContent = `The computed chi-square value (${chiSquare.toFixed(4)}) is greater than or equal to the critical value (${criticalValue.toFixed(4)}) for α = ${alpha} and df = ${df}.`;
+                    resultText.textContent = 'Significant';
+                    significanceIndicator.textContent = 'Reject H₀';
+                    significanceIndicator.className = 'significance significant';
+                    significanceIndicator.classList.remove('hidden');
+                } else {
+                    comparisonText.textContent = `χ² (${chiSquare.toFixed(4)}) < Critical Value (${criticalValue.toFixed(4)})`;
+                    comparisonDetails.textContent = `The computed chi-square value (${chiSquare.toFixed(4)}) is less than the critical value (${criticalValue.toFixed(4)}) for α = ${alpha} and df = ${df}.`;
+                    resultText.textContent = 'Not Significant';
+                    significanceIndicator.textContent = 'Fail to reject H₀';
+                    significanceIndicator.className = 'significance not-significant';
+                    significanceIndicator.classList.remove('hidden');
+                }
+                
+                // Update interpretation
+                const interpretationText = document.getElementById('interpretation-text');
+                if (isSignificant) {
+                    interpretationText.textContent = `The chi-square test result is statistically significant at α = ${alpha}. Since the computed χ² (${chiSquare.toFixed(4)}) is greater than or equal to the critical value (${criticalValue.toFixed(4)}), we reject the null hypothesis. This suggests there is a relationship between the variables. The observed frequencies differ significantly from what would be expected if there were no relationship.`;
+                } else {
+                    interpretationText.textContent = `The chi-square test result is not statistically significant at α = ${alpha}. Since the computed χ² (${chiSquare.toFixed(4)}) is less than the critical value (${criticalValue.toFixed(4)}), we fail to reject the null hypothesis. This suggests there is no significant relationship between the variables. Any differences between observed and expected frequencies could be due to random chance.`;
+                }
+            }
+            
+            // Display expected frequencies
+            displayExpectedFrequencies();
+            
+            // Display detailed breakdown table of χ² contributions
+            displayBreakdownTable();
+            // Make sure breakdown container is visible
+            const bd = document.getElementById('breakdown-table-container');
+            if (bd) bd.style.display = 'block';
+
+            // Display observed data table in results
+            displayObservedTableInResults();
+
+            // Highlight the critical value in the table
+            highlightCriticalValue(df, alpha);
+        }
+        
+        // Display observed data table in results
+        function displayObservedTableInResults() {
+            const container = document.getElementById('observed-table-display');
+            container.innerHTML = '';
+
+            if (grandTotal === 0) {
+                container.innerHTML = '<p>No data entered yet.</p>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.style.marginTop = '10px';
+
+            // Header row with category names
+            let html = '<thead><tr><th></th>';
+            for (let j = 0; j < categories; j++) {
+                html += `<th>${categoryNames[j] || `Category ${j+1}`}</th>`;
+            }
+            html += '<th>Row Total</th></tr></thead>';
+
+            // Body rows
+            html += '<tbody>';
+            for (let i = 0; i < groups; i++) {
+                html += `<tr><th>${groupNames[i] || `Group ${i+1}`}</th>`;
+
+                for (let j = 0; j < categories; j++) {
+                    const value = (observedData[i] && observedData[i][j]) ? observedData[i][j] : 0;
+                    html += `<td>${value}</td>`;
+                }
+
+                html += `<td style="font-weight:700;">${rowTotals[i]}</td></tr>`;
+            }
+
+            // Column totals row
+            html += '<tr><th>Column Total</th>';
+            for (let j = 0; j < categories; j++) {
+                html += `<td style="font-weight:700;">${columnTotals[j]}</td>`;
+            }
+            html += `<td style="font-weight:700;">${grandTotal}</td></tr>`;
+
+            html += '</tbody>';
+            table.innerHTML = html;
+            container.appendChild(table);
+        }
+
+        // Display detailed breakdown table showing O, E, O-E and (O-E)^2 / E per cell
+        function displayBreakdownTable() {
+            const container = document.getElementById('breakdown-table-container');
+            container.innerHTML = '';
+
+            const table = document.createElement('table');
+            table.style.marginTop = '10px';
+            table.style.width = '100%';
+            table.style.borderCollapse = 'collapse';
+
+            // Header
+            let html = '<thead><tr style="background:#f1f3f5;"><th style="padding:8px;">Group</th><th style="padding:8px;">Category</th><th style="padding:8px;">Observed (O)</th><th style="padding:8px;">Expected (E)</th><th style="padding:8px;">O - E</th><th style="padding:8px;">(O - E)² / E</th></tr></thead>';
+            html += '<tbody>';
+
+            let totalChi = 0;
+
+            for (let i = 0; i < groups; i++) {
+                for (let j = 0; j < categories; j++) {
+                    const obs = (observedData[i] && typeof observedData[i][j] !== 'undefined') ? observedData[i][j] : 0;
+                    const exp = (expectedData[i] && typeof expectedData[i][j] !== 'undefined') ? expectedData[i][j] : 0;
+                    const diff = obs - exp;
+                    let contrib = 0;
+                    let contribText = '0.00';
+
+                    if (exp > 0) {
+                        contrib = Math.pow(diff, 2) / exp;
+                        contribText = contrib.toFixed(2);
+                    } else {
+                        contribText = '0.00';
+                    }
+
+                    totalChi += contrib;
+
+                    html += `<tr style="border-top:1px solid #e9ecef;"><td style="padding:8px;text-align:left;">${groupNames[i] || `Group ${i+1}`}</td><td style="padding:8px;">${categoryNames[j] || `Category ${j+1}`}</td><td style="padding:8px;">${obs}</td><td style="padding:8px;">${exp.toFixed(2)}</td><td style="padding:8px;">${diff.toFixed(2)}</td><td style="padding:8px;">${contribText}</td></tr>`;
+                }
+            }
+
+            // Total row
+            html += `<tr style="font-weight:700;background:#f8f9fb;"><td colspan="5" style="padding:8px;">Total χ²</td><td style="padding:8px;">${totalChi.toFixed(2)}</td></tr>`;
+
+            html += '</tbody>';
+            table.innerHTML = html;
+            container.appendChild(table);
+        }
+        
+        // Function to download results as Word document
+        function downloadResultsAsWord() {
+            if (grandTotal === 0) {
+                alert("Please enter data and calculate results first!");
+                return;
+            }
+            
+            // Get all the data we need for the report
+            const chiSquare = parseFloat(document.getElementById('chi-square-value').textContent);
+            const df = parseInt(document.getElementById('degrees-of-freedom').textContent);
+            const criticalValue = parseFloat(document.getElementById('critical-value').textContent);
+            const resultText = document.getElementById('result-text').textContent;
+            const comparisonText = document.getElementById('comparison-text').textContent;
+            const comparisonDetails = document.getElementById('comparison-details').textContent;
+            const interpretationText = document.getElementById('interpretation-text').textContent;
+            const alpha = document.getElementById('significance-level').value;
+            
+            // Get current date and time
+            const now = new Date();
+            const dateStr = now.toLocaleDateString();
+            const timeStr = now.toLocaleTimeString();
+            
+            // Create Word document content
+            const content = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Chi-Square Test Results</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 40px; }
+                    h1 { color: #6a2fb2; border-bottom: 2px solid #ffc107; padding-bottom: 10px; }
+                    h2 { color: #8b3fb6; margin-top: 25px; }
+                    h3 { color: #182848; }
+                    table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                    th { background-color: #f8f9fa; font-weight: bold; }
+                    .result-box { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; }
+                    .significance { font-weight: bold; padding: 5px 10px; border-radius: 3px; }
+                    .significant { background-color: #fff3cd; color: #856404; }
+                    .not-significant { background-color: #f8f9fa; color: #6c757d; }
+                    .footer { margin-top: 40px; font-size: 0.9em; color: #6c757d; border-top: 1px solid #ddd; padding-top: 15px; }
+                </style>
+            </head>
+            <body>
+                <h1>Chi-Square Test of Independence Results</h1>
+                <p><strong>Report Generated:</strong> ${dateStr} at ${timeStr}</p>
+                
+                <h2>1. Test Overview</h2>
+                <p>This report presents the results of a chi-square test of independence conducted to examine the relationship between ${groups} groups and ${categories} categories.</p>
+                
+                <h2>2. Observed Frequencies</h2>
+                ${document.getElementById('observed-table-display').innerHTML}
+                
+                <h2>3. Expected Frequencies</h2>
+                ${document.getElementById('expected-table-container').innerHTML}
+                
+                <h2>4. Chi-Square Calculation Details</h2>
+                ${document.getElementById('breakdown-table-container').innerHTML}
+                
+                <h2>5. Statistical Results</h2>
+                <div class="result-box">
+                    <table style="width: 70%;">
+                        <tr>
+                            <td style="text-align: left; width: 50%;"><strong>1. H₀ (Null Hypothesis):</strong></td>
+                            <td style="text-align: left;">${resultText === 'Significant' ? 'REJECTED' : 'ACCEPTED'}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;"><strong>2. Degrees of Freedom (df):</strong></td>
+                            <td style="text-align: left;">${df}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;"><strong>3. Significance Level (α):</strong></td>
+                            <td style="text-align: left;">${alpha}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;"><strong>4. Critical Value:</strong></td>
+                            <td style="text-align: left;">${criticalValue.toFixed(4)}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;"><strong>5. Computed χ² Value:</strong></td>
+                            <td style="text-align: left;">${chiSquare.toFixed(4)}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;"><strong>6. Decision:</strong></td>
+                            <td style="text-align: left;">${comparisonText}</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <h2>6. Statistical Comparison</h2>
+                <p>${comparisonDetails}</p>
+                
+                <h2>7. Interpretation</h2>
+                <p>${interpretationText}</p>
+                
+                <h2>8. Critical Value Reference</h2>
+                <p>For degrees of freedom = ${df} and α = ${alpha}, the critical value from the chi-square distribution table is ${criticalValue.toFixed(4)}.</p>
+                
+                <div class="footer">
+                    <p><strong>Notes:</strong></p>
+                    <ul>
+                        <li>The chi-square test assumes that observations are independent and expected frequencies are sufficiently large (typically ≥ 5).</li>
+                        <li>This analysis was performed using the Chi-Square Test of Independence Calculator.</li>
+                        <li>For important research analyses, consult with a qualified statistician.</li>
+                    </ul>
+                    <p>Generated by: Chi-Square Test Calculator | ${dateStr}</p>
+                </div>
+            </body>
+            </html>
+            `;
+            
+            // Create a Blob with the HTML content
+            const blob = new Blob([content], { type: 'application/msword' });
+            
+            // Create download link
+            const link = document.createElement('a');
+            const fileName = `ChiSquare_Results_${dateStr.replace(/\//g, '-')}_${timeStr.replace(/:/g, '-')}.doc`;
+            
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            link.click();
+            
+            // Clean up
+            URL.revokeObjectURL(link.href);
+        }
+        
+        // Navigate between steps
+        function goToStep(step) {
+            // Hide all steps
+            step1Section.classList.remove('active');
+            step2Section.classList.remove('active');
+            step3Section.classList.remove('active');
+            
+            // Remove active class from all step indicators
+            step1Indicator.classList.remove('active', 'completed');
+            step2Indicator.classList.remove('active', 'completed');
+            step3Indicator.classList.remove('active', 'completed');
+            
+            // Show the selected step
+            if (step === 1) {
+                step1Section.classList.add('active');
+                step1Indicator.classList.add('active');
+            } else if (step === 2) {
+                step2Section.classList.add('active');
+                step2Indicator.classList.add('active');
+                step1Indicator.classList.add('completed');
+                createDataTable();
+            } else if (step === 3) {
+                step3Section.classList.add('active');
+                step3Indicator.classList.add('active');
+                step1Indicator.classList.add('completed');
+                step2Indicator.classList.add('completed');
+                updateResultsDisplay();
+            }
+            
+            currentStep = step;
+        }
+        
+        // PWA Installation Setup
+        function setupPWA() {
+            // Register service worker
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('sw.js')
+                        .then(registration => {
+                            console.log('ServiceWorker registered:', registration);
+                        })
+                        .catch(error => {
+                            console.log('ServiceWorker registration failed:', error);
+                        });
+                });
+            }
+            
+            // Listen for beforeinstallprompt event
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                
+                // Show install buttons
+                installButton.style.display = 'block';
+                mobileInstallBtn.style.display = 'flex';
+                
+                // Update mobile install button text
+                if (isRunningStandalone()) {
+                    mobileInstallBtn.innerHTML = '<i class="fas fa-check"></i> App Installed';
+                    mobileInstallBtn.disabled = true;
+                    mobileInstallBtn.style.opacity = '0.7';
+                }
+            });
+            
+            // Listen for appinstalled event
+            window.addEventListener('appinstalled', (evt) => {
+                console.log('App installed successfully');
+                deferredPrompt = null;
+                installButton.style.display = 'none';
+                mobileInstallBtn.innerHTML = '<i class="fas fa-check"></i> App Installed';
+                mobileInstallBtn.disabled = true;
+                mobileInstallBtn.style.opacity = '0.7';
+            });
+        }
+        
+        // Check if app is running in standalone mode
+        function checkStandaloneMode() {
+            if (isRunningStandalone()) {
+                console.log('App is running in standalone mode');
+                document.body.classList.add('standalone-mode');
+                mobileInstallBtn.innerHTML = '<i class="fas fa-check"></i> App Installed';
+                mobileInstallBtn.disabled = true;
+                mobileInstallBtn.style.opacity = '0.7';
+            }
+        }
+        
+        function isRunningStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone === true;
+        }
+        
+        // Install app function
+        async function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                    deferredPrompt = null;
+                }
+            }
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Step navigation
+            document.getElementById('num-groups').addEventListener('change', updateTableSizeControls);
+            document.getElementById('num-categories').addEventListener('change', updateTableSizeControls);
+            
+            document.getElementById('next-step1').addEventListener('click', function() {
+                goToStep(2);
+            });
+            
+            document.getElementById('back-step2').addEventListener('click', function() {
+                goToStep(1);
+            });
+            
+            document.getElementById('next-step2').addEventListener('click', function() {
+                goToStep(3);
+            });
+            
+            document.getElementById('back-step3').addEventListener('click', function() {
+                goToStep(2);
+            });
+            
+            document.getElementById('new-calculation-btn').addEventListener('click', function() {
+                // Reset data
+                observedData = [];
+                goToStep(1);
+            });
+            
+            document.getElementById('clear-table-btn').addEventListener('click', function() {
+                // Clear all data inputs
+                document.querySelectorAll('.data-input').forEach(input => {
+                    input.value = '0';
+                });
+                updateTotals();
+            });
+            
+            document.getElementById('auto-fill-btn').addEventListener('click', function() {
+                // Fill with random data
+                for (let i = 0; i < groups; i++) {
+                    for (let j = 0; j < categories; j++) {
+                        const randomValue = Math.floor(Math.random() * 50) + 1;
+                        const input = document.getElementById(`cell-${i}-${j}`);
+                        if (input) input.value = randomValue;
+                    }
+                }
+                updateTotals();
+            });
+            
+            document.getElementById('significance-level').addEventListener('change', function() {
+                if (currentStep === 3) {
+                    updateResultsDisplay();
+                }
+            });
+            
+            // Download results button
+            document.getElementById('download-results-btn').addEventListener('click', downloadResultsAsWord);
+            
+            // Install buttons
+            installButton.addEventListener('click', installApp);
+            mobileInstallBtn.addEventListener('click', installApp);
+            
+            // Step indicator click events
+            step1Indicator.addEventListener('click', function() {
+                goToStep(1);
+            });
+            
+            step2Indicator.addEventListener('click', function() {
+                if (currentStep > 1) goToStep(2);
+            });
+            
+            step3Indicator.addEventListener('click', function() {
+                if (currentStep > 2) goToStep(3);
+            });
+            
+            // Prevent pull-to-refresh in standalone mode
+            if (isRunningStandalone()) {
+                document.body.style.overscrollBehavior = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
