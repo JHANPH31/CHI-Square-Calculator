@@ -358,8 +358,8 @@ self.addEventListener('push', (event) => {
   let data = {
     title: 'Chi-Square Calculator',
     body: 'New update available!',
-    icon: './CHIlogo.png',
-    badge: './chiPHONEE.png'
+    icon: './chiPHONEE.png',
+    badge: './CHIlogo.png'
   };
   
   if (event.data) {
@@ -406,3 +406,4 @@ self.addEventListener('notificationclick', (event) => {
       })
   );
 });
+
