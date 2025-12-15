@@ -509,63 +509,86 @@
             border-left: 4px solid #ffc107;
         }
         
-        /* PWA Install Button */
-        #pwaInstallButton {
+        /* Instant Install Button */
+        #instantInstallBtn {
             display: none;
             position: fixed;
             bottom: 20px;
-            right: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             background: linear-gradient(135deg, #6a2fb2, #8b3fb6);
             color: white;
             border: none;
-            border-radius: 25px;
-            padding: 12px 24px;
+            border-radius: 50px;
+            padding: 15px 40px;
             font-weight: bold;
+            font-size: 1.2rem;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(106, 47, 178, 0.3);
-            z-index: 9999;
-            font-size: 14px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            transition: all 0.3s ease;
-        }
-        
-        #pwaInstallButton:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(106, 47, 178, 0.4);
-        }
-        
-        /* Quick Actions Buttons */
-        .quick-actions {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            display: flex;
-            gap: 10px;
+            box-shadow: 0 6px 20px rgba(106, 47, 178, 0.4);
             z-index: 9998;
-        }
-        
-        .quick-action-btn {
-            background: linear-gradient(135deg, var(--primary-1), var(--primary-2));
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 10px 20px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 3px 10px rgba(106, 47, 178, 0.2);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            animation: pulseInstall 2s infinite;
         }
         
-        .quick-action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(106, 47, 178, 0.3);
+        #instantInstallBtn:hover {
+            transform: translateX(-50%) translateY(-3px);
+            box-shadow: 0 10px 25px rgba(106, 47, 178, 0.6);
+            background: linear-gradient(135deg, #8b3fb6, #6a2fb2);
         }
         
-        .quick-action-btn.new {
-            background: linear-gradient(135deg, #ffc107, #ff9800);
+        #instantInstallBtn:active {
+            transform: translateX(-50%) translateY(1px);
+            box-shadow: 0 4px 15px rgba(106, 47, 178, 0.3);
+        }
+        
+        @keyframes pulseInstall {
+            0% { box-shadow: 0 6px 20px rgba(106, 47, 178, 0.4); }
+            50% { box-shadow: 0 6px 25px rgba(106, 47, 178, 0.7); }
+            100% { box-shadow: 0 6px 20px rgba(106, 47, 178, 0.4); }
+        }
+        
+        /* Mobile styles for install button */
+        @media (max-width: 768px) {
+            .start-button {
+                padding: 16px 45px;
+                font-size: 1.6rem;
+                border-radius: 40px;
+                margin-top: 180px;
+            }
+            
+            #instantInstallBtn {
+                bottom: 15px;
+                padding: 12px 30px;
+                font-size: 1.1rem;
+                width: 90%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .start-button {
+                padding: 14px 35px;
+                font-size: 1.3rem;
+                border-radius: 35px;
+                margin-top: 160px;
+                letter-spacing: 1px;
+            }
+            
+            .start-button i {
+                font-size: 1.2rem;
+            }
+            
+            #instantInstallBtn {
+                bottom: 10px;
+                padding: 10px 25px;
+                font-size: 1rem;
+                width: 95%;
+            }
         }
         
         @media (max-width: 1024px) {
@@ -580,10 +603,6 @@
             .start-button {
                 padding: 20px 60px;
                 font-size: 1.8rem;
-            }
-            
-            .quick-actions {
-                bottom: 80px; /* Move up to avoid overlapping with install button */
             }
         }
         
@@ -609,52 +628,6 @@
             .start-screen-bg {
                 background-size: cover;
                 background-position: center;
-            }
-            
-            .start-button {
-                padding: 16px 45px;
-                font-size: 1.6rem;
-                border-radius: 40px;
-                margin-top: 180px;
-            }
-            
-            #pwaInstallButton {
-                bottom: 10px;
-                right: 10px;
-                padding: 10px 20px;
-                font-size: 13px;
-            }
-            
-            .quick-actions {
-                bottom: 70px;
-                left: 10px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .start-button {
-                padding: 14px 35px;
-                font-size: 1.3rem;
-                border-radius: 35px;
-                margin-top: 160px;
-                letter-spacing: 1px;
-            }
-            
-            .start-button i {
-                font-size: 1.2rem;
-            }
-            
-            #pwaInstallButton {
-                bottom: 10px;
-                right: 10px;
-                padding: 8px 16px;
-                font-size: 12px;
-            }
-            
-            .quick-actions {
-                flex-direction: column;
-                bottom: 60px;
-                left: 10px;
             }
         }
     </style>
@@ -882,15 +855,10 @@
         </div>
     </div>
     
-    <!-- Quick Actions Buttons -->
-    <div class="quick-actions" id="quickActions">
-        <button class="quick-action-btn new" onclick="goToStep(1)">
-            <i class="fas fa-plus-circle"></i> New
-        </button>
-        <button class="quick-action-btn" onclick="goToStep(3)">
-            <i class="fas fa-chart-bar"></i> Results
-        </button>
-    </div>
+    <!-- Instant Install Button -->
+    <button id="instantInstallBtn">
+        <i class="fas fa-download"></i> Install App
+    </button>
     
     <footer>
         <p>Chi-Square Test Calculator with Critical Value Table</p>
@@ -898,42 +866,58 @@
     </footer>
     
     <script>
-        // ==================== PWA INSTALLATION CODE ====================
+        // ==================== INSTANT INSTALL BUTTON ====================
         let deferredPrompt;
-        const installButton = document.createElement('button');
-        installButton.id = 'pwaInstallButton';
-        installButton.innerHTML = '📱 Install App';
-        document.body.appendChild(installButton);
+        const instantInstallBtn = document.getElementById('instantInstallBtn');
         
         // Listen for PWA install prompt
         window.addEventListener('beforeinstallprompt', (e) => {
             console.log('✅ PWA Install Prompt Available');
             e.preventDefault();
             deferredPrompt = e;
-            installButton.style.display = 'block';
-            
-            installButton.addEventListener('click', () => {
-                installButton.style.display = 'none';
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('✅ User installed the PWA');
-                        localStorage.setItem('pwaInstalled', 'true');
-                    } else {
-                        console.log('❌ User declined PWA installation');
-                        setTimeout(() => {
-                            if (deferredPrompt) installButton.style.display = 'block';
-                        }, 15000);
-                    }
-                    deferredPrompt = null;
-                });
-            });
         });
         
-        // Track successful installation
+        // Handle instant install button click
+        instantInstallBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) {
+                alert("Your browser doesn't support app installation or it's already installed!");
+                instantInstallBtn.style.display = 'none';
+                return;
+            }
+            
+            // Show install prompt
+            deferredPrompt.prompt();
+            
+            // Wait for user choice
+            const choiceResult = await deferredPrompt.userChoice;
+            
+            if (choiceResult.outcome === 'accepted') {
+                console.log('✅ User accepted the PWA installation');
+                instantInstallBtn.innerHTML = '<i class="fas fa-check-circle"></i> Installed!';
+                instantInstallBtn.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+                instantInstallBtn.disabled = true;
+                
+                setTimeout(() => {
+                    instantInstallBtn.style.display = 'none';
+                }, 2000);
+            } else {
+                console.log('❌ User declined PWA installation');
+                instantInstallBtn.innerHTML = '<i class="fas fa-times-circle"></i> Installation Cancelled';
+                instantInstallBtn.style.background = 'linear-gradient(135deg, #dc3545, #e83e8c)';
+                
+                setTimeout(() => {
+                    instantInstallBtn.innerHTML = '<i class="fas fa-download"></i> Install App';
+                    instantInstallBtn.style.background = 'linear-gradient(135deg, #6a2fb2, #8b3fb6)';
+                }, 1500);
+            }
+            
+            deferredPrompt = null;
+        });
+        
+        // Hide button when app is already installed
         window.addEventListener('appinstalled', (evt) => {
             console.log('🎉 PWA Successfully Installed');
-            installButton.style.display = 'none';
+            instantInstallBtn.style.display = 'none';
             deferredPrompt = null;
         });
         
@@ -941,7 +925,7 @@
         if (window.matchMedia('(display-mode: standalone)').matches || 
             window.navigator.standalone === true) {
             console.log('📱 App running in standalone mode');
-            installButton.style.display = 'none';
+            instantInstallBtn.style.display = 'none';
         }
         
         // ==================== SERVICE WORKER REGISTRATION ====================
@@ -1081,12 +1065,18 @@
             });
         }
         
-        // Show main app and hide start screen
+        // Show main app and hide start screen - UPDATED WITH INSTALL BUTTON
         function showMainApp() {
             startScreen.classList.add('hidden');
             setTimeout(() => {
                 mainHeader.classList.add('app-visible');
                 mainContainer.classList.add('app-visible');
+                
+                // SHOW INSTALL BUTTON AFTER START SCREEN
+                if (deferredPrompt) {
+                    instantInstallBtn.style.display = 'flex';
+                }
+                
                 document.getElementById('num-groups').focus();
             }, 300);
         }
