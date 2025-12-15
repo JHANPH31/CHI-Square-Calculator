@@ -1,6 +1,6 @@
 // Service Worker for Chi-Square Calculator PWA
-const CACHE_NAME = 'chi-square-calculator-v1.0';
-const APP_VERSION = '1.0';
+const CACHE_NAME = 'chi-square-calculator-v1.2';
+const APP_VERSION = '1.2';
 
 // Files to cache for offline use
 const APP_FILES = [
@@ -56,62 +56,128 @@ self.addEventListener('activate', event => {
 
 // Fetch event - serve cached files when offline
 self.addEventListener('fetch', event => {
-  // Skip non-GET requests and browser extensions
   if (event.request.method !== 'GET') return;
   if (event.request.url.startsWith('chrome-extension://')) return;
   
-  event.respondWith(
-    caches.match(event.request)
-      .then(cachedResponse => {
-        // Return cached file if available
+  const requestUrl = new URL(event.request.url);
+  
+  // Handle different types of requests
+  if (requestUrl.pathname.endsWith('.html') || event.request.destination === 'document') {
+    // For HTML pages: Network first, then cache
+    event.respondWith(networkFirstStrategy(event.request));
+  } else if (event.request.destination === 'image' || 
+             requestUrl.pathname.match(/\.(png|jpg|jpeg|gif|svg)$/)) {
+    // For images: Cache first, then network
+    event.respondWith(cacheFirstStrategy(event.request));
+  } else if (requestUrl.hostname.includes('cdnjs.cloudflare.com') ||
+             requestUrl.hostname.includes('cdn.jsdelivr.net')) {
+    // For CDN resources: Cache first with network fallback
+    event.respondWith(cacheFirstStrategy(event.request));
+  } else {
+    // For other resources: Network first with cache fallback
+    event.respondWith(networkFirstStrategy(event.request));
+  }
+});
+
+// Cache First Strategy (for static assets)
+function cacheFirstStrategy(request) {
+  return caches.match(request).then(cachedResponse => {
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    
+    return fetch(request).then(networkResponse => {
+      if (networkResponse && networkResponse.status === 200) {
+        const responseClone = networkResponse.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(request, responseClone);
+        });
+      }
+      return networkResponse;
+    }).catch(() => {
+      if (request.destination === 'image') {
+        return caches.match('/CHI-Square-Calculator/CHIlogo.png');
+      }
+      return new Response('Offline - No network connection', {
+        status: 503,
+        headers: { 'Content-Type': 'text/plain' }
+      });
+    });
+  });
+}
+
+// Network First Strategy (for HTML and dynamic content)
+function networkFirstStrategy(request) {
+  return fetch(request)
+    .then(networkResponse => {
+      if (networkResponse && networkResponse.status === 200) {
+        const responseClone = networkResponse.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(request, responseClone);
+        });
+      }
+      return networkResponse;
+    })
+    .catch(() => {
+      return caches.match(request).then(cachedResponse => {
         if (cachedResponse) {
           return cachedResponse;
         }
         
-        // Otherwise fetch from network
-        return fetch(event.request)
-          .then(networkResponse => {
-            // Don't cache external CDN files unless they're critical
-            const isLocalFile = event.request.url.includes('jhanph31.github.io');
-            const isCriticalCDN = event.request.url.includes('cdnjs.cloudflare.com/ajax/libs/font-awesome');
-            
-            if ((isLocalFile || isCriticalCDN) && networkResponse.ok) {
-              // Cache the response for future use
-              const responseToCache = networkResponse.clone();
-              caches.open(CACHE_NAME)
-                .then(cache => {
-                  cache.put(event.request, responseToCache);
-                });
-            }
-            
-            return networkResponse;
-          })
-          .catch(error => {
-            console.log('[Service Worker] Fetch failed, offline:', error);
-            
-            // For HTML pages, return the cached index.html
-            if (event.request.headers.get('accept').includes('text/html')) {
-              return caches.match('/CHI-Square-Calculator/index.html');
-            }
-            
-            // For missing images, return the app icon
-            if (event.request.destination === 'image') {
-              return caches.match('/CHI-Square-Calculator/CHIlogo.png');
-            }
-            
-            return new Response('Offline - Network connection required', {
-              status: 503,
-              statusText: 'Offline',
-              headers: new Headers({ 'Content-Type': 'text/plain' })
-            });
-          });
-      })
-  );
-});
+        if (request.destination === 'document') {
+          return caches.match('/CHI-Square-Calculator/index.html');
+        }
+        
+        return new Response('You are offline and this resource is not cached.', {
+          status: 503,
+          headers: { 'Content-Type': 'text/plain' }
+        });
+      });
+    });
+}
 
 // Handle service worker updates
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
+});
+
+// Handle push notifications (optional feature)
+self.addEventListener('push', event => {
+  if (!event.data) return;
+  
+  const data = event.data.text();
+  const options = {
+    body: data || 'Chi-Square Calculator Update',
+    icon: '/CHI-Square-Calculator/CHIlogo.png',
+    badge: '/CHI-Square-Calculator/CHIlogo.png',
+    vibrate: [100, 50, 100],
+    data: {
+      url: '/CHI-Square-Calculator/'
+    }
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification('Chi-Square Calculator', options)
+  );
+});
+
+// Handle notification click
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then(windowClients => {
+        for (let client of windowClients) {
+          if (client.url.includes(self.location.origin) && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        if (clients.openWindow) {
+          return clients.openWindow('/CHI-Square-Calculator/');
+        }
+      })
+  );
 });
