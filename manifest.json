@@ -1,6 +1,6 @@
 {
   "name": "Chi-Square Test Calculator",
-  "short_name": "Chi² Calc",
+  "short_name": "Chi-Square Calculator",
   "description": "Statistical analysis tool for chi-square test of independence with critical values",
   "start_url": "/CHI-Square-Calculator/",
   "scope": "/CHI-Square-Calculator/",
@@ -53,3 +53,4 @@
   "dir": "ltr",
   "prefer_related_applications": false
 }
+
